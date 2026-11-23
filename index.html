@@ -3,154 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PulseKPI Studio — Agent Performance & Bonus Tracker</title>
-  <style>
-    :root {
-      --bg-main: #0b1120;
-      --bg-panel: #111827;
-      --bg-card: #161f33;
-      --bg-input: #1e293b;
-      --border: #27354f;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent: #6366f1;
-      --accent-hover: #4f46e5;
-      --green: #10b981;
-      --amber: #f59e0b;
-      --red: #f43f5e;
-      --sky: #38bdf8;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      line-height: 1.5;
-    }
-    header {
-      background: var(--bg-panel);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-logo {
-      width: 38px; height: 38px; border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 18px; color: #fff;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
-    }
-    .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
-    .brand p { font-size: 12px; color: var(--text-muted); }
-    .header-actions { display: flex; gap: 10px; }
-    button {
-      font-family: inherit;
-      cursor: pointer;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 9px 14px;
-      transition: all 0.15s ease;
-    }
-    button:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
-    .btn-secondary:hover:not(:disabled) { background: #283548; }
-    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
-    .app-shell { display: flex; flex: 1; }
-    aside {
-      width: 260px;
-      background: var(--bg-panel);
-      border-right: 1px solid var(--border);
-      padding: 20px 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 24px;
-      flex-shrink: 0;
-    }
-    .sidebar-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; padding: 0 6px; }
-    .month-list { display: flex; flex-direction: column; gap: 6px; }
-    .month-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: transparent; color: var(--text-muted); border-radius: 10px; font-size: 13px; text-align: left; }
-    .month-btn:hover { background: var(--bg-input); color: var(--text-main); }
-    .month-btn.active { background: var(--accent); color: #fff; }
-    .badge { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 700; }
-    .badge-active { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
-    .badge-archived { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
-    .rules-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-size: 12px; color: var(--text-muted); }
-    .rules-box h4 { color: #fff; font-size: 13px; margin-bottom: 8px; }
-    .rules-box div { margin-bottom: 4px; }
-    .txt-green { color: var(--green); font-weight: 600; }
-    .txt-red { color: var(--red); font-weight: 600; }
-    .txt-amber { color: var(--amber); font-weight: 600; }
-    .txt-sky { color: var(--sky); font-weight: 600; }
-    main { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
-    .archived-banner { display: none; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); color: #fcd34d; padding: 12px 16px; border-radius: 12px; font-size: 13px; align-items: center; justify-content: space-between; }
-    .archived-banner.show { display: flex; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .section-header h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
-    .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); transition: transform 0.15s ease, border-color 0.15s ease; }
-    .kpi-card:hover { border-color: #3b4f75; transform: translateY(-2px); }
-    .kpi-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-    .kpi-value { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
-    .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-    .panels-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
-    @media (max-width: 960px) {
-      .app-shell { flex-direction: column; }
-      aside { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
-      .panels-grid { grid-template-columns: 1fr; }
-    }
-    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25); }
-    .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .panel-header h3 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-    .pill { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: rgba(99, 102, 241, 0.18); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.35); }
-    .form-group { margin-bottom: 14px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
-    input, select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; color: #fff; font-size: 13px; outline: none; }
-    input:focus, select:focus { border-color: var(--accent); }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
-    th { padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border); }
-    td { padding: 11px 12px; border-bottom: 1px solid rgba(39, 53, 79, 0.5); }
-    tr:hover td { background: rgba(30, 41, 59, 0.45); }
-    .status-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
-    .tag-pos { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
-    .tag-neg { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
-    .tag-neu { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
-    .btn-del { background: transparent; color: var(--red); padding: 4px 8px; font-size: 12px; }
-    .btn-del:hover { background: rgba(244, 63, 94, 0.15); }
-    .grip { cursor: grab; color: #64748b; user-select: none; }
-    .grip:active { cursor: grabbing; }
-    .dragging { opacity: 0.45; }
-    .drag-over { outline: 2px dashed var(--sky); outline-offset: 4px; }
-  </style>
+  <title>PulseKPI Studio — Agent Performance &amp; Bonus Tracker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <header>
     <div class="brand">
       <div class="brand-logo">P</div>
       <div>
         <h1>PulseKPI Studio</h1>
-        <p>Modular Case Log &amp; €300 Bonus Engine</p>
+        <p>Modular Case Log &amp; Real-Time €300 Bonus Engine</p>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-secondary" onclick="exportCSV()">Export CSV</button>
-      <button id="archiveBtn" class="btn-primary" onclick="archiveAndNewMonth()">Archive &amp; Start New Month</button>
+      <button type="button" class="btn-secondary" id="exportBtn">Export CSV</button>
+      <button type="button" class="btn-primary" id="archiveBtn">Archive &amp; Start New Month</button>
     </div>
   </header>
 
@@ -173,14 +41,27 @@
 
     <main>
       <div id="archivedBanner" class="archived-banner">
-        <span><strong>Archived Sheet (Read-Only):</strong> Case history and formulas are locked.</span>
-        <button class="btn-secondary" onclick="switchToActiveMonth()">Return to Active Month</button>
+        <span><strong>Archived Sheet (Read-Only):</strong> Case history, date range, and formulas are locked.</span>
+        <button type="button" class="btn-secondary" id="returnActiveBtn">Return to Active Month</button>
+      </div>
+
+      <div class="period-bar">
+        <div class="period-info">
+          <span class="sidebar-label" style="margin:0;">Active Period:</span>
+          <strong id="periodTitle" style="color:#fff; font-size:14px;"></strong>
+        </div>
+        <div class="period-inputs">
+          <label style="margin:0; font-size:11px;">From</label>
+          <input type="date" id="startDateInput" />
+          <label style="margin:0; font-size:11px;">To</label>
+          <input type="date" id="endDateInput" />
+        </div>
       </div>
 
       <section>
         <div class="section-header">
-          <h2>Live KPI &amp; Bonus Modules (Drag Cards to Reorder)</h2>
-          <button class="btn-secondary" style="padding: 5px 10px; font-size: 11px;" onclick="resetLayout()">Reset Layout</button>
+          <h2>Real-Time KPI &amp; €300 Bonus Tracker (Drag Cards to Reorder)</h2>
+          <button type="button" class="btn-secondary btn-xs" id="resetLayoutBtn">Reset Layout</button>
         </div>
         <div id="kpiGrid" class="kpi-grid"></div>
       </section>
@@ -192,7 +73,7 @@
             <span id="activeMonthBadge" class="pill"></span>
           </div>
 
-          <form id="caseForm" onsubmit="addCase(event)">
+          <form id="caseForm">
             <div class="form-group">
               <label>Case ID / Ticket #</label>
               <input type="text" id="caseId" required placeholder="e.g. CASE-4092" />
@@ -237,7 +118,7 @@
               </div>
             </div>
 
-            <button type="submit" id="submitCaseBtn" class="btn-primary" style="width: 100%; margin-top: 6px;">
+            <button type="submit" id="submitCaseBtn" class="btn-primary btn-full">
               + Add Case to Sheet
             </button>
           </form>
@@ -246,7 +127,7 @@
         <div id="panel-table" draggable="true" class="panel workspace-panel">
           <div class="panel-header">
             <h3><span class="grip">⋮⋮</span> Monthly Case Ledger</h3>
-            <span id="caseCountLabel" style="font-size: 12px; color: var(--text-muted);">0 cases logged</span>
+            <span id="caseCountLabel" class="muted-text">0 cases logged</span>
           </div>
 
           <div class="table-wrap">
@@ -259,7 +140,7 @@
                   <th>CRT NE</th>
                   <th>Triage</th>
                   <th>Quality</th>
-                  <th style="text-align: right;">Action</th>
+                  <th class="text-right">Action</th>
                 </tr>
               </thead>
               <tbody id="caseTableBody"></tbody>
@@ -269,290 +150,7 @@
       </section>
     </main>
   </div>
-   <script>
-    const STORAGE_KEY = 'pulse_kpi_standalone_v3';
 
-    function getCurrentMonthLabel(offset = 0) {
-      const d = new Date();
-      d.setMonth(d.getMonth() + offset);
-      return d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-    }
-
-    const defaultState = {
-      activeTabId: 'tab-1',
-      kpiOrder: ['bonus', 'csat', 'aht', 'quality', 'crt'],
-      panelOrder: ['panel-entry', 'panel-table'],
-      tabs: [
-        {
-          id: 'tab-1',
-          name: getCurrentMonthLabel(0),
-          archived: false,
-          cases: [
-            { id: 'CASE-1001', aht: 24.5, csat: 'Positive', crt: 'Saved', triage: 'Saved', quality: 95 },
-            { id: 'CASE-1002', aht: 29.0, csat: 'Positive', crt: 'Saved', triage: 'Saved', quality: 92 },
-            { id: 'CASE-1003', aht: 31.0, csat: 'Positive', crt: 'Saved', triage: 'Saved', quality: 94 }
-          ]
-        }
-      ]
-    };
-
-    let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
-    function getActiveTab() {
-      return state.tabs.find(t => t.id === state.activeTabId) || state.tabs;
-    }
-
-    function computeMetrics(cases) {
-      const validCsat = cases.filter(c => c.csat === 'Positive' || c.csat === 'Negative');
-      const posCsat = validCsat.filter(c => c.csat === 'Positive').length;
-      const csatPct = validCsat.length ? (posCsat / validCsat.length) * 100 : null;
-
-      const validCrt = cases.filter(c => c.crt === 'Saved' || c.crt === 'Lost');
-      const savedCrt = validCrt.filter(c => c.crt === 'Saved').length;
-      const crtPct = validCrt.length ? (savedCrt / validCrt.length) * 100 : null;
-
-      const validAht = cases.filter(c => typeof c.aht === 'number' && !isNaN(c.aht));
-      const avgAht = validAht.length ? validAht.reduce((s, c) => s + c.aht, 0) / validAht.length : null;
-
-      const validQual = cases.filter(c => typeof c.quality === 'number' && !isNaN(c.quality));
-      const avgQual = validQual.length ? validQual.reduce((s, c) => s + c.quality, 0) / validQual.length : null;
-
-      let csatBonus = 0;
-      if (csatPct !== null) {
-        if (csatPct >= 94) csatBonus = 180;
-        else if (csatPct >= 89) csatBonus = 100;
-      }
-
-      const crtBonus = (crtPct !== null && crtPct >= 94) ? 80 : 0;
-      const qualBonus = (avgQual !== null && avgQual >= 90) ? 40 : 0;
-
-      let subtotal = csatBonus + crtBonus + qualBonus;
-      let penalty = 0;
-      let forfeited = false;
-
-      if (csatPct !== null && csatPct < 75) {
-        forfeited = true;
-        subtotal = 0;
-      } else if (avgAht !== null && avgAht > 32) {
-        penalty = 50;
-        subtotal = Math.max(0, subtotal - penalty);
-      }
-
-      return { csatPct, csatBonus, crtPct, crtBonus, avgAht, penalty, avgQual, qualBonus, totalBonus: subtotal, forfeited };
-    }
-
-    function render() {
-      const tab = getActiveTab();
-      const m = computeMetrics(tab.cases);
-
-      document.getElementById('monthTabsList').innerHTML = state.tabs.map(t => `
-        <button class="month-btn ${t.id === tab.id ? 'active' : ''}" onclick="selectTab('${t.id}')">
-          <span>${t.name}</span>
-          <span class="badge ${t.archived ? 'badge-archived' : 'badge-active'}">${t.archived ? 'Archived' : 'Active'}</span>
-        </button>
-      `).join('');
-
-      const banner = document.getElementById('archivedBanner');
-      const submitBtn = document.getElementById('submitCaseBtn');
-      const archiveBtn = document.getElementById('archiveBtn');
-      document.getElementById('activeMonthBadge').textContent = tab.name;
-
-      if (tab.archived) {
-        banner.classList.add('show');
-        submitBtn.disabled = true;
-        archiveBtn.disabled = true;
-      } else {
-        banner.classList.remove('show');
-        submitBtn.disabled = false;
-        archiveBtn.disabled = false;
-      }
-
-      const cardsData = {
-        bonus: {
-          title: 'Total Bonus Payout',
-          value: `€${m.totalBonus}`,
-          sub: m.forfeited ? 'Forfeited (CSAT < 75%)' : m.penalty > 0 ? '-€50 AHT penalty applied' : 'Target: €300 max pool',
-          color: m.forfeited ? 'txt-red' : 'txt-green'
-        },
-        csat: {
-          title: 'CSAT Score',
-          value: m.csatPct !== null ? `${m.csatPct.toFixed(1)}%` : '—',
-          sub: `Bonus: +€${m.csatBonus} (Target ≥94%)`,
-          color: m.csatPct === null ? '' : m.csatPct >= 94 ? 'txt-green' : m.csatPct < 75 ? 'txt-red' : 'txt-amber'
-        },
-        aht: {
-          title: 'Average AHT',
-          value: m.avgAht !== null ? `${m.avgAht.toFixed(1)}m` : '—',
-          sub: m.avgAht !== null && m.avgAht > 32 ? 'Over 32m (-€50)' : 'Limit: ≤ 32.0 mins',
-          color: m.avgAht !== null && m.avgAht > 32 ? 'txt-red' : 'txt-sky'
-        },
-        quality: {
-          title: 'Quality Score',
-          value: m.avgQual !== null ? `${m.avgQual.toFixed(1)}%` : '—',
-          sub: `Bonus: +€${m.qualBonus} (Target ≥90%)`,
-          color: m.avgQual !== null && m.avgQual >= 90 ? 'txt-green' : ''
-        },
-        crt: {
-          title: 'CRT NE Rate',
-          value: m.crtPct !== null ? `${m.crtPct.toFixed(1)}%` : '—',
-          sub: `Bonus: +€${m.crtBonus} (Target ≥94%)`,
-          color: m.crtPct !== null && m.crtPct >= 94 ? 'txt-green' : ''
-        }
-      };
-
-      document.getElementById('kpiGrid').innerHTML = state.kpiOrder.map(key => {
-        const c = cardsData[key];
-        return `
-          <div data-kpi="${key}" draggable="true" class="kpi-card">
-            <div class="kpi-top">
-              <span>${c.title}</span>
-              <span class="grip">⋮⋮</span>
-            </div>
-            <div class="kpi-value ${c.color}">${c.value}</div>
-            <div class="kpi-sub">${c.sub}</div>
-          </div>
-        `;
-      }).join('');
-
-      const panelsContainer = document.getElementById('panelsContainer');
-      state.panelOrder.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) panelsContainer.appendChild(el);
-      });
-
-      document.getElementById('caseCountLabel').textContent = `${tab.cases.length} cases logged`;
-      const tbody = document.getElementById('caseTableBody');
-      if (!tab.cases.length) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--text-muted);">No cases logged for ${tab.name} yet.</td></tr>`;
-      } else {
-        tbody.innerHTML = tab.cases.map((c, idx) => `
-          <tr>
-            <td style="font-weight:600;">${c.id}</td>
-            <td class="${c.aht > 32 ? 'txt-red' : ''}">${c.aht}m</td>
-            <td><span class="status-tag ${c.csat === 'Positive' ? 'tag-pos' : c.csat === 'Negative' ? 'tag-neg' : 'tag-neu'}">${c.csat}</span></td>
-            <td>${c.crt}</td>
-            <td>${c.triage}</td>
-            <td>${c.quality !== null ? c.quality + '%' : '—'}</td>
-            <td style="text-align:right;">
-              ${tab.archived ? '<span style="color:var(--text-muted); font-size:11px;">Locked</span>' : `<button class="btn-del" onclick="deleteCase(${idx})">Remove</button>`}
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      bindDragAndDrop();
-    }
-
-    function addCase(e) {
-      e.preventDefault();
-      const tab = getActiveTab();
-      if (tab.archived) return;
-      const qualRaw = document.getElementById('qualityInput').value;
-      tab.cases.unshift({
-        id: document.getElementById('caseId').value.trim(),
-        aht: parseFloat(document.getElementById('ahtInput').value),
-        csat: document.getElementById('csatInput').value,
-        crt: document.getElementById('crtInput').value,
-        triage: document.getElementById('triageInput').value,
-        quality: qualRaw === '' ? null : parseFloat(qualRaw)
-      });
-      e.target.reset();
-      saveState();
-      render();
-    }
-
-    function deleteCase(idx) {
-      const tab = getActiveTab();
-      if (tab.archived) return;
-      tab.cases.splice(idx, 1);
-      saveState();
-      render();
-    }
-
-    function selectTab(id) {
-      state.activeTabId = id;
-      saveState();
-      render();
-    }
-
-    function switchToActiveMonth() {
-      const active = state.tabs.find(t => !t.archived);
-      if (active) selectTab(active.id);
-    }
-
-    function archiveAndNewMonth() {
-      const current = getActiveTab();
-      if (current.archived) return;
-      const nextName = prompt('Enter name for the new clean monthly tab:', getCurrentMonthLabel(state.tabs.length));
-      if (!nextName) return;
-      current.archived = true;
-      const newId = 'tab-' + Date.now();
-      state.tabs.unshift({ id: newId, name: nextName.trim(), archived: false, cases: [] });
-      state.activeTabId = newId;
-      saveState();
-      render();
-    }
-
-    function resetLayout() {
-      state.kpiOrder = ['bonus', 'csat', 'aht', 'quality', 'crt'];
-      state.panelOrder = ['panel-entry', 'panel-table'];
-      saveState();
-      render();
-    }
-
-    function exportCSV() {
-      const tab = getActiveTab();
-      const headers = ['Case ID', 'AHT', 'CSAT', 'CRT NE', 'Triage', 'Quality'];
-      const rows = tab.cases.map(c => [c.id, c.aht, c.csat, c.crt, c.triage, c.quality ?? '']);
-      const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${tab.name.replace(/\s+/g, '_')}_KPI_Log.csv`;
-      a.click();
-    }
-
-    function bindDragAndDrop() {
-      let draggedKpi = null;
-      document.querySelectorAll('.kpi-card').forEach(card => {
-        card.addEventListener('dragstart', () => { draggedKpi = card.dataset.kpi; card.classList.add('dragging'); });
-        card.addEventListener('dragend', () => card.classList.remove('dragging'));
-        card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag-over'); });
-        card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
-card.addEventListener('drop', e => {
-e.preventDefault();
-card.classList.remove('drag-over');
-const targetKpi = card.dataset.kpi;
-if (draggedKpi && draggedKpi !== targetKpi) {
-const from = state.kpiOrder.indexOf(draggedKpi);
-const to = state.kpiOrder.indexOf(targetKpi);
-state.kpiOrder.splice(from, 1);
-state.kpiOrder.splice(to, 0, draggedKpi);
-saveState();
-render();
-}
-});
-});
-let draggedPanel = null;
-document.querySelectorAll('.workspace-panel').forEach(panel => {
-panel.addEventListener('dragstart', e => { if (e.target !== panel) return; draggedPanel = panel.id; panel.classList.add('dragging'); });
-panel.addEventListener('dragend', () => panel.classList.remove('dragging'));
-panel.addEventListener('dragover', e => { e.preventDefault(); panel.classList.add('drag-over'); });
-panel.addEventListener('dragleave', () => panel.classList.remove('drag-over'));
-panel.addEventListener('drop', e => {
-e.preventDefault();
-panel.classList.remove('drag-over');
-if (draggedPanel && draggedPanel !== panel.id) {
-state.panelOrder.reverse();
-saveState();
-render();
-}
-});
-});
-}
-document.addEventListener('DOMContentLoaded', render);
+  <script src="app.js"></script>
+</body>
+</html>
