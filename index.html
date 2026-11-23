@@ -3,136 +3,233 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PulseKPI — Agent Performance & Bonus Tracker</title>
-  <!-- Load Tailwind CSS for modern software styling -->
-  <script src="https://tailwindcss.com"></script>
+  <title>PulseKPI Studio — Agent Performance & Bonus Tracker</title>
   <style>
-    /* Import clean Inter font and set dark theme base colors */
-    @import url('https://googleapis.com');
-    body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-
-    /* Visual feedback classes for draggable KPI cards and panels */
-    .drag-over { outline: 2px dashed #38bdf8; outline-offset: 4px; background-color: rgba(56, 189, 248, 0.08); }
-    .dragging { opacity: 0.45; }
-    .grip { cursor: grab; }
+    :root {
+      --bg-main: #0b1120;
+      --bg-panel: #111827;
+      --bg-card: #161f33;
+      --bg-input: #1e293b;
+      --border: #27354f;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #f43f5e;
+      --sky: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+    header {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px; color: #fff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+    .brand h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+    .brand p { font-size: 12px; color: var(--text-muted); }
+    .header-actions { display: flex; gap: 10px; }
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 14px;
+      transition: all 0.15s ease;
+    }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: #283548; }
+    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+    .app-shell { display: flex; flex: 1; }
+    aside {
+      width: 260px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      flex-shrink: 0;
+    }
+    .sidebar-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 10px; padding: 0 6px; }
+    .month-list { display: flex; flex-direction: column; gap: 6px; }
+    .month-btn { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: transparent; color: var(--text-muted); border-radius: 10px; font-size: 13px; text-align: left; }
+    .month-btn:hover { background: var(--bg-input); color: var(--text-main); }
+    .month-btn.active { background: var(--accent); color: #fff; }
+    .badge { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 700; }
+    .badge-active { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .badge-archived { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+    .rules-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; font-size: 12px; color: var(--text-muted); }
+    .rules-box h4 { color: #fff; font-size: 13px; margin-bottom: 8px; }
+    .rules-box div { margin-bottom: 4px; }
+    .txt-green { color: var(--green); font-weight: 600; }
+    .txt-red { color: var(--red); font-weight: 600; }
+    .txt-amber { color: var(--amber); font-weight: 600; }
+    .txt-sky { color: var(--sky); font-weight: 600; }
+    main { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+    .archived-banner { display: none; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); color: #fcd34d; padding: 12px 16px; border-radius: 12px; font-size: 13px; align-items: center; justify-content: space-between; }
+    .archived-banner.show { display: flex; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .section-header h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; }
+    .kpi-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25); transition: transform 0.15s ease, border-color 0.15s ease; }
+    .kpi-card:hover { border-color: #3b4f75; transform: translateY(-2px); }
+    .kpi-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .kpi-value { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+    .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .panels-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 960px) {
+      .app-shell { flex-direction: column; }
+      aside { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
+      .panels-grid { grid-template-columns: 1fr; }
+    }
+    .panel { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25); }
+    .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .panel-header h3 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .pill { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: rgba(99, 102, 241, 0.18); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.35); }
+    .form-group { margin-bottom: 14px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
+    input, select { width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; color: #fff; font-size: 13px; outline: none; }
+    input:focus, select:focus { border-color: var(--accent); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th { padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+    td { padding: 11px 12px; border-bottom: 1px solid rgba(39, 53, 79, 0.5); }
+    tr:hover td { background: rgba(30, 41, 59, 0.45); }
+    .status-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+    .tag-pos { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+    .tag-neg { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
+    .tag-neu { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+    .btn-del { background: transparent; color: var(--red); padding: 4px 8px; font-size: 12px; }
+    .btn-del:hover { background: rgba(244, 63, 94, 0.15); }
+    .grip { cursor: grab; color: #64748b; user-select: none; }
     .grip:active { cursor: grabbing; }
+    .dragging { opacity: 0.45; }
+    .drag-over { outline: 2px dashed var(--sky); outline-offset: 4px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
-
-  <!-- TOP NAVIGATION BAR: App title, CSV export, and monthly archive action -->
-  <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4 sticky top-0 z-20">
-    <div class="flex items-center gap-3">
-      <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">P</div>
+<body>
+  <header>
+    <div class="brand">
+      <div class="brand-logo">P</div>
       <div>
-        <h1 class="text-lg font-bold tracking-tight text-white">PulseKPI Studio</h1>
-        <p class="text-xs text-slate-400">Modular Case Log & €300 Bonus Engine</p>
+        <h1>PulseKPI Studio</h1>
+        <p>Modular Case Log &amp; €300 Bonus Engine</p>
       </div>
     </div>
-
-    <div class="flex items-center gap-3">
-      <!-- Downloads current sheet data as a CSV file -->
-      <button onclick="exportCSV()" class="px-3.5 py-2 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition">
-        Export CSV
-      </button>
-      <!-- Locks active month and generates a fresh clean month tab -->
-      <button id="archiveBtn" onclick="archiveAndNewMonth()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 transition">
-        Archive & Start New Month
-      </button>
+    <div class="header-actions">
+      <button class="btn-secondary" onclick="exportCSV()">Export CSV</button>
+      <button id="archiveBtn" class="btn-primary" onclick="archiveAndNewMonth()">Archive &amp; Start New Month</button>
     </div>
   </header>
 
-  <!-- MAIN APPLICATION CONTAINER -->
-  <div class="flex flex-1 overflow-hidden">
-
-    <!-- LEFT SIDEBAR: Monthly sheet switcher and quick bonus rule legend -->
-    <aside class="w-64 bg-slate-900/70 border-r border-slate-800 p-4 flex flex-col justify-between shrink-0">
+  <div class="app-shell">
+    <aside>
       <div>
-        <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 px-2">Monthly Sheets</div>
-        <!-- Dynamic list of active & archived month tabs injected via JS -->
-        <div id="monthTabsList" class="space-y-1.5"></div>
+        <div class="sidebar-label">Monthly Sheets</div>
+        <div id="monthTabsList" class="month-list"></div>
       </div>
 
-      <!-- Static reference box displaying the €300 bonus rules -->
-      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5 text-xs text-slate-300 space-y-1.5">
-        <div class="font-semibold text-white">€300 Bonus Rules</div>
-        <div>• CSAT ≥94%: <span class="text-emerald-400">+€180</span> | ≥89%: <span class="text-emerald-400">+€100</span></div>
-        <div>• CSAT &lt;75%: <span class="text-rose-400 font-semibold">Forfeits All (€0)</span></div>
-        <div>• CRT NE ≥94%: <span class="text-emerald-400">+€80</span></div>
-        <div>• Quality ≥90%: <span class="text-emerald-400">+€40</span></div>
-        <div>• AHT &gt;32m: <span class="text-amber-400">-€50 Penalty</span></div>
+      <div class="rules-box">
+        <h4>€300 Bonus Rules</h4>
+        <div>• CSAT ≥94%: <span class="txt-green">+€180</span> | ≥89%: <span class="txt-green">+€100</span></div>
+        <div>• CSAT &lt;75%: <span class="txt-red">Forfeits All (€0)</span></div>
+        <div>• CRT NE ≥94%: <span class="txt-green">+€80</span></div>
+        <div>• Quality ≥90%: <span class="txt-green">+€40</span></div>
+        <div>• AHT &gt;32m: <span class="txt-amber">-€50 Penalty</span></div>
       </div>
     </aside>
 
-    <!-- MAIN MODULAR WORKSPACE -->
-    <main class="flex-1 p-6 overflow-y-auto space-y-6">
-
-      <!-- READ-ONLY BANNER: Appears automatically when viewing an archived month -->
-      <div id="archivedBanner" class="hidden bg-amber-500/10 border border-amber-500/30 text-amber-300 px-4 py-3 rounded-xl text-sm flex items-center justify-between">
-        <span><strong>Archived Sheet (Read-Only):</strong> Formulas and case history are locked for historical records.</span>
-        <button onclick="switchToActiveMonth()" class="underline font-medium hover:text-amber-200">Return to Active Month</button>
+    <main>
+      <div id="archivedBanner" class="archived-banner">
+        <span><strong>Archived Sheet (Read-Only):</strong> Case history and formulas are locked.</span>
+        <button class="btn-secondary" onclick="switchToActiveMonth()">Return to Active Month</button>
       </div>
 
-      <!-- DRAGGABLE KPI CARDS SECTION -->
       <section>
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Live KPI & Bonus Modules (Drag to Reorder)</h2>
-          <button onclick="resetLayout()" class="text-xs text-slate-400 hover:text-white transition">Reset Layout</button>
+        <div class="section-header">
+          <h2>Live KPI &amp; Bonus Modules (Drag Cards to Reorder)</h2>
+          <button class="btn-secondary" style="padding: 5px 10px; font-size: 11px;" onclick="resetLayout()">Reset Layout</button>
         </div>
-        <!-- 5 draggable KPI cards injected here by render() -->
-        <div id="kpiGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"></div>
+        <div id="kpiGrid" class="kpi-grid"></div>
       </section>
 
-      <!-- DRAGGABLE WORKSPACE PANELS (Case Form + Case Table) -->
-      <section id="panelsContainer" class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-
-        <!-- PANEL 1: New Case Entry Form -->
-        <div id="panel-entry" draggable="true" class="workspace-panel bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl xl:col-span-1">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-white flex items-center gap-2">
-              <span class="grip text-slate-500 hover:text-slate-300">⋮⋮</span> Log Case Entry
-            </h3>
-            <span id="activeMonthBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30"></span>
+      <section id="panelsContainer" class="panels-grid">
+        <div id="panel-entry" draggable="true" class="panel workspace-panel">
+          <div class="panel-header">
+            <h3><span class="grip">⋮⋮</span> Log Case Entry</h3>
+            <span id="activeMonthBadge" class="pill"></span>
           </div>
 
-          <form id="caseForm" onsubmit="addCase(event)" class="space-y-3.5 text-sm">
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">Case ID / Ticket #</label>
-              <input type="text" id="caseId" required placeholder="e.g. CASE-4092" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500" />
+          <form id="caseForm" onsubmit="addCase(event)">
+            <div class="form-group">
+              <label>Case ID / Ticket #</label>
+              <input type="text" id="caseId" required placeholder="e.g. CASE-4092" />
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="form-row form-group">
               <div>
-                <label class="block text-xs text-slate-400 mb-1">AHT (Minutes)</label>
-                <input type="number" step="0.1" min="0" id="ahtInput" required placeholder="e.g. 24.5" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500" />
+                <label>AHT (Minutes)</label>
+                <input type="number" step="0.1" min="0" id="ahtInput" required placeholder="e.g. 24.5" />
               </div>
               <div>
-                <label class="block text-xs text-slate-400 mb-1">Quality Score (%)</label>
-                <input type="number" step="0.1" min="0" max="100" id="qualityInput" placeholder="e.g. 95" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500" />
+                <label>Quality Score (%)</label>
+                <input type="number" step="0.1" min="0" max="100" id="qualityInput" placeholder="e.g. 95" />
               </div>
             </div>
 
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">CSAT Outcome</label>
-              <select id="csatInput" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+            <div class="form-group">
+              <label>CSAT Outcome</label>
+              <select id="csatInput">
                 <option value="Positive">Positive</option>
                 <option value="Negative">Negative</option>
                 <option value="Pending">Pending / No Survey</option>
               </select>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="form-row form-group">
               <div>
-                <label class="block text-xs text-slate-400 mb-1">CRT NE</label>
-                <select id="crtInput" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                <label>CRT NE</label>
+                <select id="crtInput">
                   <option value="Saved">Saved</option>
                   <option value="Lost">Lost</option>
                   <option value="N/A">N/A</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs text-slate-400 mb-1">Triage</label>
-                <select id="triageInput" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                <label>Triage</label>
+                <select id="triageInput">
                   <option value="Saved">Saved</option>
                   <option value="Lost">Lost</option>
                   <option value="N/A">N/A</option>
@@ -140,55 +237,47 @@
               </div>
             </div>
 
-            <button type="submit" id="submitCaseBtn" class="w-full py-2.5 mt-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 font-semibold text-white transition">
+            <button type="submit" id="submitCaseBtn" class="btn-primary" style="width: 100%; margin-top: 6px;">
               + Add Case to Sheet
             </button>
           </form>
         </div>
- <!-- PANEL 2: Monthly Case Ledger Table -->
-        <div id="panel-table" draggable="true" class="workspace-panel bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl xl:col-span-2 flex flex-col">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-semibold text-white flex items-center gap-2">
-              <span class="grip text-slate-500 hover:text-slate-300">⋮⋮</span> Monthly Case Ledger
-            </h3>
-            <span id="caseCountLabel" class="text-xs text-slate-400">0 cases logged</span>
+
+        <div id="panel-table" draggable="true" class="panel workspace-panel">
+          <div class="panel-header">
+            <h3><span class="grip">⋮⋮</span> Monthly Case Ledger</h3>
+            <span id="caseCountLabel" style="font-size: 12px; color: var(--text-muted);">0 cases logged</span>
           </div>
 
-          <div class="overflow-x-auto flex-1">
-            <table class="w-full text-left border-collapse text-sm">
+          <div class="table-wrap">
+            <table>
               <thead>
-                <tr class="border-b border-slate-800 text-xs uppercase text-slate-400">
-                  <th class="py-2.5 px-3">Case ID</th>
-                  <th class="py-2.5 px-3">AHT</th>
-                  <th class="py-2.5 px-3">CSAT</th>
-                  <th class="py-2.5 px-3">CRT NE</th>
-                  <th class="py-2.5 px-3">Triage</th>
-                  <th class="py-2.5 px-3">Quality</th>
-                  <th class="py-2.5 px-3 text-right">Action</th>
+                <tr>
+                  <th>Case ID</th>
+                  <th>AHT</th>
+                  <th>CSAT</th>
+                  <th>CRT NE</th>
+                  <th>Triage</th>
+                  <th>Quality</th>
+                  <th style="text-align: right;">Action</th>
                 </tr>
               </thead>
-              <!-- Case rows dynamically injected here -->
-              <tbody id="caseTableBody" class="divide-y divide-slate-800/60"></tbody>
+              <tbody id="caseTableBody"></tbody>
             </table>
           </div>
         </div>
-
       </section>
     </main>
   </div>
+   <script>
+    const STORAGE_KEY = 'pulse_kpi_standalone_v3';
 
-  <script>
-    // LocalStorage key so all tabs, cases, and drag layouts persist in the browser
-    const STORAGE_KEY = 'pulse_kpi_state_v2';
-
-    // Helper: Formats month & year labels (e.g., "November 2026")
     function getCurrentMonthLabel(offset = 0) {
       const d = new Date();
       d.setMonth(d.getMonth() + offset);
       return d.toLocaleString('en-US', { month: 'long', year: 'numeric' });
     }
 
-    // Initial state with sample cases for demonstration
     const defaultState = {
       activeTabId: 'tab-1',
       kpiOrder: ['bonus', 'csat', 'aht', 'quality', 'crt'],
@@ -207,281 +296,234 @@
       ]
     };
 
-    // Load saved data from browser storage or fall back to defaultState
     let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
 
-    // Saves current state to browser localStorage
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
 
-    // Returns the currently selected monthly tab object
     function getActiveTab() {
       return state.tabs.find(t => t.id === state.activeTabId) || state.tabs;
     }
 
-    // =========================================================================
-    // CORE KPI & €300 BONUS CALCULATION ENGINE
-    // =========================================================================
     function computeMetrics(cases) {
-      // 1. CSAT % = Positive / (Positive + Negative)
       const validCsat = cases.filter(c => c.csat === 'Positive' || c.csat === 'Negative');
       const posCsat = validCsat.filter(c => c.csat === 'Positive').length;
       const csatPct = validCsat.length ? (posCsat / validCsat.length) * 100 : null;
 
-      // 2. CRT NE % = Saved / (Saved + Lost)
       const validCrt = cases.filter(c => c.crt === 'Saved' || c.crt === 'Lost');
       const savedCrt = validCrt.filter(c => c.crt === 'Saved').length;
       const crtPct = validCrt.length ? (savedCrt / validCrt.length) * 100 : null;
 
-      // 3. Average Handle Time (AHT)
       const validAht = cases.filter(c => typeof c.aht === 'number' && !isNaN(c.aht));
       const avgAht = validAht.length ? validAht.reduce((s, c) => s + c.aht, 0) / validAht.length : null;
 
-      // 4. Average Quality Score
       const validQual = cases.filter(c => typeof c.quality === 'number' && !isNaN(c.quality));
       const avgQual = validQual.length ? validQual.reduce((s, c) => s + c.quality, 0) / validQual.length : null;
 
-      // 5. CSAT Bonus Tier: >=94% -> €180 | >=89% -> €100
       let csatBonus = 0;
       if (csatPct !== null) {
         if (csatPct >= 94) csatBonus = 180;
         else if (csatPct >= 89) csatBonus = 100;
       }
 
-      // 6. CRT NE Bonus Tier: >=94% -> €80
       const crtBonus = (crtPct !== null && crtPct >= 94) ? 80 : 0;
-
-      // 7. Quality Bonus Tier: >=90% -> €40 (Completes €180 + €80 + €40 = €300 pool)
       const qualBonus = (avgQual !== null && avgQual >= 90) ? 40 : 0;
 
       let subtotal = csatBonus + crtBonus + qualBonus;
       let penalty = 0;
       let forfeited = false;
 
-      // 8. CSAT Disqualification Rule: If CSAT < 75%, entire €300 bonus is forfeited
       if (csatPct !== null && csatPct < 75) {
         forfeited = true;
         subtotal = 0;
-      } else {
-        // 9. AHT Ceiling Rule: If AHT > 32 mins, deduct €50 from total bonus
-        if (avgAht !== null && avgAht > 32) {
-          penalty = 50;
-          subtotal = Math.max(0, subtotal - penalty);
-        }
+      } else if (avgAht !== null && avgAht > 32) {
+        penalty = 50;
+        subtotal = Math.max(0, subtotal - penalty);
       }
 
-      return {
-        csatPct, csatBonus,
-        crtPct, crtBonus,
-        avgAht, penalty,
-        avgQual, qualBonus,
-        totalBonus: subtotal,
-        forfeited
-      };
+      return { csatPct, csatBonus, crtPct, crtBonus, avgAht, penalty, avgQual, qualBonus, totalBonus: subtotal, forfeited };
     }
 
-    // =========================================================================
-    // UI RENDERING ENGINE
-    // =========================================================================
     function render() {
       const tab = getActiveTab();
       const m = computeMetrics(tab.cases);
 
-      // Render Sidebar Month Tabs
-      const tabsList = document.getElementById('monthTabsList');
-      tabsList.innerHTML = state.tabs.map(t => {
-        const isSelected = t.id === tab.id;
-        return `
-          <button onclick="selectTab('${t.id}')" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition ${
-            isSelected ? 'bg-indigo-600 text-white shadow' : 'text-slate-300 hover:bg-slate-800'
-          }">
-            <span class="truncate">${t.name}</span>
-            <span class="text-[10px] px-1.5 py-0.5 rounded ${
-              t.archived ? 'bg-slate-700 text-slate-300' : 'bg-emerald-500/20 text-emerald-300'
-            }">${t.archived ? 'Archived' : 'Active'}</span>
-          </button>
-        `;
-      }).join('');
+      document.getElementById('monthTabsList').innerHTML = state.tabs.map(t => `
+        <button class="month-btn ${t.id === tab.id ? 'active' : ''}" onclick="selectTab('${t.id}')">
+          <span>${t.name}</span>
+          <span class="badge ${t.archived ? 'badge-archived' : 'badge-active'}">${t.archived ? 'Archived' : 'Active'}</span>
+        </button>
+      `).join('');
 
-      // Toggle Read-Only Lock if viewing an Archived Month
       const banner = document.getElementById('archivedBanner');
       const submitBtn = document.getElementById('submitCaseBtn');
       const archiveBtn = document.getElementById('archiveBtn');
       document.getElementById('activeMonthBadge').textContent = tab.name;
 
       if (tab.archived) {
-        banner.classList.remove('hidden');
+        banner.classList.add('show');
         submitBtn.disabled = true;
-        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
         archiveBtn.disabled = true;
-        archiveBtn.classList.add('opacity-50', 'cursor-not-allowed');
       } else {
-        banner.classList.add('hidden');
+        banner.classList.remove('show');
         submitBtn.disabled = false;
-        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
         archiveBtn.disabled = false;
-        archiveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
       }
 
-      // Build KPI Card Data Objects
       const cardsData = {
         bonus: {
           title: 'Total Bonus Payout',
           value: `€${m.totalBonus}`,
-          sub: m.forfeited
-            ? 'Forfeited (CSAT < 75%)'
-            : m.penalty > 0
-              ? `-€50 AHT penalty applied`
-              : `Target: €300 max pool`,
-          accent: m.forfeited ? 'text-rose-400' : 'text-emerald-400'
+          sub: m.forfeited ? 'Forfeited (CSAT < 75%)' : m.penalty > 0 ? '-€50 AHT penalty applied' : 'Target: €300 max pool',
+          color: m.forfeited ? 'txt-red' : 'txt-green'
         },
         csat: {
           title: 'CSAT Score',
           value: m.csatPct !== null ? `${m.csatPct.toFixed(1)}%` : '—',
           sub: `Bonus: +€${m.csatBonus} (Target ≥94%)`,
-          accent: m.csatPct === null ? 'text-slate-300' : m.csatPct >= 94 ? 'text-emerald-400' : m.csatPct < 75 ? 'text-rose-400' : 'text-amber-300'
+          color: m.csatPct === null ? '' : m.csatPct >= 94 ? 'txt-green' : m.csatPct < 75 ? 'txt-red' : 'txt-amber'
         },
         aht: {
           title: 'Average AHT',
           value: m.avgAht !== null ? `${m.avgAht.toFixed(1)}m` : '—',
           sub: m.avgAht !== null && m.avgAht > 32 ? 'Over 32m (-€50)' : 'Limit: ≤ 32.0 mins',
-          accent: m.avgAht !== null && m.avgAht > 32 ? 'text-rose-400' : 'text-sky-400'
+          color: m.avgAht !== null && m.avgAht > 32 ? 'txt-red' : 'txt-sky'
         },
         quality: {
           title: 'Quality Score',
           value: m.avgQual !== null ? `${m.avgQual.toFixed(1)}%` : '—',
           sub: `Bonus: +€${m.qualBonus} (Target ≥90%)`,
-          accent: m.avgQual !== null && m.avgQual >= 90 ? 'text-emerald-400' : 'text-slate-300'
+          color: m.avgQual !== null && m.avgQual >= 90 ? 'txt-green' : ''
         },
         crt: {
           title: 'CRT NE Rate',
           value: m.crtPct !== null ? `${m.crtPct.toFixed(1)}%` : '—',
           sub: `Bonus: +€${m.crtBonus} (Target ≥94%)`,
-          accent: m.crtPct !== null && m.crtPct >= 94 ? 'text-emerald-400' : 'text-slate-300'
+          color: m.crtPct !== null && m.crtPct >= 94 ? 'txt-green' : ''
         }
       };
 
-      // Render KPI Cards in user's custom dragged order
-      const kpiGrid = document.getElementById('kpiGrid');
-      kpiGrid.innerHTML = state.kpiOrder.map(key => {
+      document.getElementById('kpiGrid').innerHTML = state.kpiOrder.map(key => {
         const c = cardsData[key];
         return `
-          <div data-kpi="${key}" draggable="true" class="kpi-card bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg hover:border-slate-700 transition">
-            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+          <div data-kpi="${key}" draggable="true" class="kpi-card">
+            <div class="kpi-top">
               <span>${c.title}</span>
-              <span class="grip text-slate-600 hover:text-slate-300">⋮⋮</span>
+              <span class="grip">⋮⋮</span>
             </div>
-            <div class="text-2xl font-bold ${c.accent}">${c.value}</div>
-            <div class="text-xs text-slate-400 mt-1">${c.sub}</div>
+            <div class="kpi-value ${c.color}">${c.value}</div>
+            <div class="kpi-sub">${c.sub}</div>
           </div>
         `;
       }).join('');
-      // Apply user's custom dragged order for Workspace Panels
-const panelsContainer = document.getElementById('panelsContainer');
-state.panelOrder.forEach(id => {
-const el = document.getElementById(id);
-if (el) panelsContainer.appendChild(el);
-});
-// Render Case Ledger Table Rows
-document.getElementById('caseCountLabel').textContent = ${tab.cases.length} cases logged;
-const tbody = document.getElementById('caseTableBody');
-if (!tab.cases.length) {
-tbody.innerHTML = <tr><td colspan="7" class="py-8 text-center text-slate-500 text-xs">No cases logged for ${tab.name} yet.</td></tr>;
-} else {
-tbody.innerHTML = tab.cases.map((c, idx) => `
-${c.id}
-${c.aht}m${c.crt}${c.triage}${c.quality !== null ? c.quality + '%' : '—'}{tab.archived ? '<span class="text-xs text-slate-600">Locked</span>' :
-`<button onclick="deleteCase({idx})" class="text-xs text-rose-400 hover:text-rose-300">Remove`}`).join('');
-}
-bindDragAndDrop();
-}
-// =========================================================================
-// USER ACTIONS (Add Case, Delete Case, Archive Month, Export CSV)
-// =========================================================================
-function addCase(e) {
-e.preventDefault();
-const tab = getActiveTab();
-if (tab.archived) return;
-const qualRaw = document.getElementById('qualityInput').value;
-tab.cases.unshift({
-id: document.getElementById('caseId').value.trim(),
-aht: parseFloat(document.getElementById('ahtInput').value),
-csat: document.getElementById('csatInput').value,
-crt: document.getElementById('crtInput').value,
-triage: document.getElementById('triageInput').value,
-quality: qualRaw === '' ? null : parseFloat(qualRaw)
-});
-e.target.reset();
-saveState();
-render();
-}
-function deleteCase(index) {
-const tab = getActiveTab();
-if (tab.archived) return;
-tab.cases.splice(index, 1);
-saveState();
-render();
-}
-function selectTab(id) {
-state.activeTabId = id;
-saveState();
-render();
-}
-function switchToActiveMonth() {
-const active = state.tabs.find(t => !t.archived);
-if (active) selectTab(active.id);
-}
-// Locks current month as read-only and creates a blank month tab with formulas active
-function archiveAndNewMonth() {
-const current = getActiveTab();
-if (current.archived) return;
-const nextName = prompt('Enter name for the new clean monthly tab:', getCurrentMonthLabel(state.tabs.length));
-if (!nextName) return;
-current.archived = true;
-const newId = 'tab-' + Date.now();
-state.tabs.unshift({
-id: newId,
-name: nextName.trim(),
-archived: false,
-cases: []
-});
-state.activeTabId = newId;
-saveState();
-render();
-}
-function resetLayout() {
-state.kpiOrder = ['bonus', 'csat', 'aht', 'quality', 'crt'];
-state.panelOrder = ['panel-entry', 'panel-table'];
-saveState();
-render();
-}
-function exportCSV() {
-const tab = getActiveTab();
-const headers = ['Case ID', 'AHT', 'CSAT', 'CRT NE', 'Triage', 'Quality'];
-const rows = tab.cases.map(c => [c.id, c.aht, c.csat, c.crt, c.triage, c.quality ?? '']);
-const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-const blob = new Blob([csv], { type: 'text/csv' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = ${tab.name.replace(/\s+/g, '_')}_KPI_Log.csv;
-a.click();
-}
-// =========================================================================
-// MODULAR DRAG-AND-DROP REORDERING ENGINE
-// =========================================================================
-function bindDragAndDrop() {
-// 1. Reorder KPI Cards
-let draggedKpi = null;
-document.querySelectorAll('.kpi-card').forEach(card => {
-card.addEventListener('dragstart', () => {
-draggedKpi = card.dataset.kpi;
-card.classList.add('dragging');
-});
-card.addEventListener('dragend', () => card.classList.remove('dragging'));
-card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag-over'); });
-card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+
+      const panelsContainer = document.getElementById('panelsContainer');
+      state.panelOrder.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) panelsContainer.appendChild(el);
+      });
+
+      document.getElementById('caseCountLabel').textContent = `${tab.cases.length} cases logged`;
+      const tbody = document.getElementById('caseTableBody');
+      if (!tab.cases.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--text-muted);">No cases logged for ${tab.name} yet.</td></tr>`;
+      } else {
+        tbody.innerHTML = tab.cases.map((c, idx) => `
+          <tr>
+            <td style="font-weight:600;">${c.id}</td>
+            <td class="${c.aht > 32 ? 'txt-red' : ''}">${c.aht}m</td>
+            <td><span class="status-tag ${c.csat === 'Positive' ? 'tag-pos' : c.csat === 'Negative' ? 'tag-neg' : 'tag-neu'}">${c.csat}</span></td>
+            <td>${c.crt}</td>
+            <td>${c.triage}</td>
+            <td>${c.quality !== null ? c.quality + '%' : '—'}</td>
+            <td style="text-align:right;">
+              ${tab.archived ? '<span style="color:var(--text-muted); font-size:11px;">Locked</span>' : `<button class="btn-del" onclick="deleteCase(${idx})">Remove</button>`}
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      bindDragAndDrop();
+    }
+
+    function addCase(e) {
+      e.preventDefault();
+      const tab = getActiveTab();
+      if (tab.archived) return;
+      const qualRaw = document.getElementById('qualityInput').value;
+      tab.cases.unshift({
+        id: document.getElementById('caseId').value.trim(),
+        aht: parseFloat(document.getElementById('ahtInput').value),
+        csat: document.getElementById('csatInput').value,
+        crt: document.getElementById('crtInput').value,
+        triage: document.getElementById('triageInput').value,
+        quality: qualRaw === '' ? null : parseFloat(qualRaw)
+      });
+      e.target.reset();
+      saveState();
+      render();
+    }
+
+    function deleteCase(idx) {
+      const tab = getActiveTab();
+      if (tab.archived) return;
+      tab.cases.splice(idx, 1);
+      saveState();
+      render();
+    }
+
+    function selectTab(id) {
+      state.activeTabId = id;
+      saveState();
+      render();
+    }
+
+    function switchToActiveMonth() {
+      const active = state.tabs.find(t => !t.archived);
+      if (active) selectTab(active.id);
+    }
+
+    function archiveAndNewMonth() {
+      const current = getActiveTab();
+      if (current.archived) return;
+      const nextName = prompt('Enter name for the new clean monthly tab:', getCurrentMonthLabel(state.tabs.length));
+      if (!nextName) return;
+      current.archived = true;
+      const newId = 'tab-' + Date.now();
+      state.tabs.unshift({ id: newId, name: nextName.trim(), archived: false, cases: [] });
+      state.activeTabId = newId;
+      saveState();
+      render();
+    }
+
+    function resetLayout() {
+      state.kpiOrder = ['bonus', 'csat', 'aht', 'quality', 'crt'];
+      state.panelOrder = ['panel-entry', 'panel-table'];
+      saveState();
+      render();
+    }
+
+    function exportCSV() {
+      const tab = getActiveTab();
+      const headers = ['Case ID', 'AHT', 'CSAT', 'CRT NE', 'Triage', 'Quality'];
+      const rows = tab.cases.map(c => [c.id, c.aht, c.csat, c.crt, c.triage, c.quality ?? '']);
+      const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${tab.name.replace(/\s+/g, '_')}_KPI_Log.csv`;
+      a.click();
+    }
+
+    function bindDragAndDrop() {
+      let draggedKpi = null;
+      document.querySelectorAll('.kpi-card').forEach(card => {
+        card.addEventListener('dragstart', () => { draggedKpi = card.dataset.kpi; card.classList.add('dragging'); });
+        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+        card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag-over'); });
+        card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
 card.addEventListener('drop', e => {
 e.preventDefault();
 card.classList.remove('drag-over');
@@ -496,14 +538,9 @@ render();
 }
 });
 });
-// 2. Reorder Workspace Panels (Form vs. Ledger Table)
 let draggedPanel = null;
 document.querySelectorAll('.workspace-panel').forEach(panel => {
-panel.addEventListener('dragstart', e => {
-if (e.target !== panel) return;
-draggedPanel = panel.id;
-panel.classList.add('dragging');
-});
+panel.addEventListener('dragstart', e => { if (e.target !== panel) return; draggedPanel = panel.id; panel.classList.add('dragging'); });
 panel.addEventListener('dragend', () => panel.classList.remove('dragging'));
 panel.addEventListener('dragover', e => { e.preventDefault(); panel.classList.add('drag-over'); });
 panel.addEventListener('dragleave', () => panel.classList.remove('drag-over'));
@@ -518,5 +555,4 @@ render();
 });
 });
 }
-// Boot application on page load
-render(); 
+document.addEventListener('DOMContentLoaded', render);
