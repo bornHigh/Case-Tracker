@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PulseKPI Studio — Agent Performance &amp; Bonus Tracker</title>
+  <title>CaseFlow KPI — Agent Performance &amp; €300 Bonus Tracker</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <header>
     <div class="brand">
-      <div class="brand-logo">P</div>
+      <div class="brand-logo">C</div>
       <div>
-        <h1>PulseKPI Studio</h1>
-        <p>Modular Case Log &amp; Real-Time €300 Bonus Engine</p>
+        <h1>CaseFlow KPI</h1>
+        <p>Modular Case Log, QA Audits &amp; Real-Time €300 Bonus Engine</p>
       </div>
     </div>
     <div class="header-actions">
@@ -24,24 +24,30 @@
 
   <div class="app-shell">
     <aside>
-      <div>
-        <div class="sidebar-label">Monthly Sheets</div>
-        <div id="monthTabsList" class="month-list"></div>
+      <div class="sidebar-top">
+        <div class="sidebar-label">Active Sheet</div>
+        <div id="activeMonthSlot" class="month-list"></div>
+
+        <button type="button" class="archive-toggle-btn" id="toggleArchivesBtn">
+          <span>Archived Reports (<span id="archiveCount">0</span>)</span>
+          <span id="archiveArrow">▾</span>
+        </button>
+        <div id="archivedMonthsList" class="month-list scrollable-months"></div>
       </div>
 
       <div class="rules-box">
         <h4>€300 Bonus Rules</h4>
-        <div>• CSAT ≥94%: <span class="txt-green">+€180</span> | ≥89%: <span class="txt-green">+€100</span></div>
-        <div>• CSAT &lt;75%: <span class="txt-red">Forfeits All (€0)</span></div>
-        <div>• CRT NE ≥94%: <span class="txt-green">+€80</span></div>
-        <div>• Quality ≥90%: <span class="txt-green">+€40</span></div>
-        <div>• AHT &gt;32m: <span class="txt-amber">-€50 Penalty</span></div>
+        <div>CSAT ≥94%: <span class="txt-green">+€180</span> | ≥89%: <span class="txt-green">+€100</span></div>
+        <div>CSAT &lt;75%: <span class="txt-red">Forfeits All (€0)</span></div>
+        <div>CRT NE ≥94%: <span class="txt-green">+€80</span></div>
+        <div>Quality ≥90%: <span class="txt-green">+€40</span></div>
+        <div>AHT &gt;32m: <span class="txt-amber">-€50 Penalty</span></div>
       </div>
     </aside>
 
     <main>
       <div id="archivedBanner" class="archived-banner">
-        <span><strong>Archived Sheet (Read-Only):</strong> Case history, date range, and formulas are locked.</span>
+        <span><strong>Archived Sheet (Read-Only):</strong> Case history, QA audits, and date range are locked.</span>
         <button type="button" class="btn-secondary" id="returnActiveBtn">Return to Active Month</button>
       </div>
 
@@ -67,86 +73,146 @@
       </section>
 
       <section id="panelsContainer" class="panels-grid">
-        <div id="panel-entry" draggable="true" class="panel workspace-panel">
-          <div class="panel-header">
-            <h3><span class="grip">⋮⋮</span> Log Case Entry</h3>
-            <span id="activeMonthBadge" class="pill"></span>
+
+        <!-- Left Column Stack: Case Entry + Separate QA Audit Box -->
+        <div id="panel-forms" draggable="true" class="stack-col workspace-panel">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><span class="grip">⋮⋮</span> Log Case Entry</h3>
+              <span id="activeMonthBadge" class="pill"></span>
+            </div>
+
+            <form id="caseForm">
+              <div class="form-row form-group">
+                <div>
+                  <label>Case ID / Ticket #</label>
+                  <input type="text" id="caseId" required placeholder="e.g. CASE-4092" />
+                </div>
+                <div>
+                  <label>Client Name</label>
+                  <input type="text" id="clientNameInput" required placeholder="e.g. Acme Corp" />
+                </div>
+              </div>
+
+              <div class="form-row form-group">
+                <div>
+                  <label>AHT (Minutes)</label>
+                  <input type="number" step="0.1" min="0" id="ahtInput" required placeholder="e.g. 24.5" />
+                </div>
+                <div>
+                  <label>CSAT Outcome</label>
+                  <select id="csatInput">
+                    <option value="Positive">Positive</option>
+                    <option value="Negative">Negative</option>
+                    <option value="Pending">Pending / No Survey</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row form-group">
+                <div>
+                  <label>CRT NE</label>
+                  <select id="crtInput">
+                    <option value="Saved">Saved</option>
+                    <option value="Lost">Lost</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Triage</label>
+                  <select id="triageInput">
+                    <option value="Saved">Saved</option>
+                    <option value="Lost">Lost</option>
+                    <option value="N/A">N/A</option>
+                  </select>
+                </div>
+              </div>
+
+              <button type="submit" id="submitCaseBtn" class="btn-primary btn-full">
+                + Add Case to Sheet
+              </button>
+            </form>
           </div>
 
-          <form id="caseForm">
-            <div class="form-group">
-              <label>Case ID / Ticket #</label>
-              <input type="text" id="caseId" required placeholder="e.g. CASE-4092" />
+          <!-- Separate QA Audit Card -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3>QA Monit / Quality Audit</h3>
+              <span id="qaAvgPill" class="pill">Avg: —</span>
             </div>
 
-            <div class="form-row form-group">
-              <div>
-                <label>AHT (Minutes)</label>
-                <input type="number" step="0.1" min="0" id="ahtInput" required placeholder="e.g. 24.5" />
+            <form id="qaForm">
+              <div class="form-group">
+                <label>Case ID</label>
+                <input type="text" id="qaCaseId" required placeholder="e.g. CASE-4092" />
               </div>
-              <div>
-                <label>Quality Score (%)</label>
-                <input type="number" step="0.1" min="0" max="100" id="qualityInput" placeholder="e.g. 95" />
-              </div>
-            </div>
 
-            <div class="form-group">
-              <label>CSAT Outcome</label>
-              <select id="csatInput">
-                <option value="Positive">Positive</option>
-                <option value="Negative">Negative</option>
-                <option value="Pending">Pending / No Survey</option>
-              </select>
-            </div>
-
-            <div class="form-row form-group">
-              <div>
-                <label>CRT NE</label>
-                <select id="crtInput">
-                  <option value="Saved">Saved</option>
-                  <option value="Lost">Lost</option>
-                  <option value="N/A">N/A</option>
-                </select>
+              <div class="form-row form-group">
+                <div>
+                  <label>Monit Provided By</label>
+                  <input type="text" id="qaAuditorInput" required placeholder="Auditor name" />
+                </div>
+                <div>
+                  <label>QA Score (%)</label>
+                  <input type="number" step="0.1" min="0" max="100" id="qaScoreInput" required placeholder="e.g. 95" />
+                </div>
               </div>
-              <div>
-                <label>Triage</label>
-                <select id="triageInput">
-                  <option value="Saved">Saved</option>
-                  <option value="Lost">Lost</option>
-                  <option value="N/A">N/A</option>
-                </select>
-              </div>
-            </div>
 
-            <button type="submit" id="submitCaseBtn" class="btn-primary btn-full">
-              + Add Case to Sheet
-            </button>
-          </form>
+              <button type="submit" id="submitQaBtn" class="btn-secondary btn-full">
+                + Log QA Audit
+              </button>
+            </form>
+          </div>
         </div>
 
-        <div id="panel-table" draggable="true" class="panel workspace-panel">
-          <div class="panel-header">
-            <h3><span class="grip">⋮⋮</span> Monthly Case Ledger</h3>
-            <span id="caseCountLabel" class="muted-text">0 cases logged</span>
+        <!-- Right Column Stack: Case Ledger + QA Audit Ledger -->
+        <div id="panel-tables" draggable="true" class="stack-col workspace-panel">
+          <div class="panel">
+            <div class="panel-header">
+              <h3><span class="grip">⋮⋮</span> Monthly Case Ledger</h3>
+              <span id="caseCountLabel" class="muted-text">0 cases logged</span>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Case ID</th>
+                    <th>Client</th>
+                    <th>AHT</th>
+                    <th>CSAT</th>
+                    <th>CRT NE</th>
+                    <th>Triage</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="caseTableBody"></tbody>
+              </table>
+            </div>
           </div>
 
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Case ID</th>
-                  <th>AHT</th>
-                  <th>CSAT</th>
-                  <th>CRT NE</th>
-                  <th>Triage</th>
-                  <th>Quality</th>
-                  <th class="text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody id="caseTableBody"></tbody>
-            </table>
+          <div class="panel">
+            <div class="panel-header">
+              <h3>QA Audit Log (Separate Matrix)</h3>
+              <span id="qaCountLabel" class="muted-text">0 audits logged</span>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Case ID</th>
+                    <th>Monit Provided By</th>
+                    <th>Score</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="qaTableBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
+
       </section>
     </main>
   </div>
