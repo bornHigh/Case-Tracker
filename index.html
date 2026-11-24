@@ -3,20 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CaseFlow KPI — Agent Performance &amp; €300 Bonus Tracker</title>
+  <title>CaseFlow Arcane — Case Tracker, QA Monit &amp; €300 Bonus Engine</title>
+  <link rel="preconnect" href="https://googleapis.com" />
+  <link rel="preconnect" href="https://gstatic.com" crossorigin />
+  <link href="https://googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+  <!-- Live Wallpaper Background Layer (Photo or Looping Video) -->
+  <div id="wallpaperLayer" class="wallpaper-layer">
+    <video id="bgVideo" autoplay loop muted playsinline class="hidden"></video>
+    <img id="bgImage" alt="" class="hidden" />
+    <div class="wallpaper-overlay"></div>
+  </div>
+
   <header>
     <div class="brand">
-      <div class="brand-logo">C</div>
+      <div class="brand-logo">✦</div>
       <div>
-        <h1>CaseFlow KPI</h1>
-        <p>Modular Case Log, QA Audits &amp; Real-Time €300 Bonus Engine</p>
+        <h1 class="fancy-title">CaseFlow Arcane</h1>
+        <p>Case Tracker, QA Monit &amp; Real-Time €300 Bonus Engine</p>
       </div>
     </div>
     <div class="header-actions">
+      <button type="button" class="btn-secondary" id="wallpaperBtn">✦ Wallpaper</button>
       <button type="button" class="btn-secondary" id="exportBtn">Export CSV</button>
       <button type="button" class="btn-primary" id="archiveBtn">Archive &amp; Start New Month</button>
     </div>
@@ -25,18 +36,18 @@
   <div class="app-shell">
     <aside>
       <div class="sidebar-top">
-        <div class="sidebar-label">Active Sheet</div>
+        <div class="sidebar-label">✦ Active Chronicle</div>
         <div id="activeMonthSlot" class="month-list"></div>
 
         <button type="button" class="archive-toggle-btn" id="toggleArchivesBtn">
-          <span>Archived Reports (<span id="archiveCount">0</span>)</span>
+          <span>Archived Chronicles (<span id="archiveCount">0</span>)</span>
           <span id="archiveArrow">▾</span>
         </button>
         <div id="archivedMonthsList" class="month-list scrollable-months"></div>
       </div>
 
       <div class="rules-box">
-        <h4>€300 Bonus Rules</h4>
+        <h4 class="fancy-title">❧ €300 Bonus Rules ❧</h4>
         <div>CSAT ≥94%: <span class="txt-green">+€180</span> | ≥89%: <span class="txt-green">+€100</span></div>
         <div>CSAT &lt;75%: <span class="txt-red">Forfeits All (€0)</span></div>
         <div>CRT NE ≥94%: <span class="txt-green">+€80</span></div>
@@ -47,14 +58,14 @@
 
     <main>
       <div id="archivedBanner" class="archived-banner">
-        <span><strong>Archived Sheet (Read-Only):</strong> Case history, QA audits, and date range are locked.</span>
+        <span><strong>Archived Chronicle (Read-Only):</strong> Case history, QA monit, and date range are sealed.</span>
         <button type="button" class="btn-secondary" id="returnActiveBtn">Return to Active Month</button>
       </div>
 
       <div class="period-bar">
         <div class="period-info">
-          <span class="sidebar-label" style="margin:0;">Active Period:</span>
-          <strong id="periodTitle" style="color:#fff; font-size:14px;"></strong>
+          <span class="sidebar-label" style="margin:0;">✦ Active Period:</span>
+          <strong id="periodTitle" class="fancy-title" style="color:#fff; font-size:15px;"></strong>
         </div>
         <div class="period-inputs">
           <label style="margin:0; font-size:11px;">From</label>
@@ -66,7 +77,7 @@
 
       <section>
         <div class="section-header">
-          <h2>Real-Time KPI &amp; €300 Bonus Tracker (Drag Cards to Reorder)</h2>
+          <h2>✦ Real-Time KPI &amp; €300 Bonus Tracker (Drag Cards to Reorder)</h2>
           <button type="button" class="btn-secondary btn-xs" id="resetLayoutBtn">Reset Layout</button>
         </div>
         <div id="kpiGrid" class="kpi-grid"></div>
@@ -74,6 +85,7 @@
 
       <section id="panelsContainer" class="panels-grid">
 
+        <!-- Left Column: Forms -->
         <div id="panel-forms" draggable="true" class="stack-col workspace-panel">
           <div class="panel">
             <div class="panel-header">
@@ -128,14 +140,14 @@
               </div>
 
               <button type="submit" id="submitCaseBtn" class="btn-primary btn-full">
-                + Add Case to Sheet
+                + Add Case to Tracker
               </button>
             </form>
           </div>
 
           <div class="panel">
             <div class="panel-header">
-              <h3>QA Monit / Quality Audit</h3>
+              <h3>✦ Log QA Monit</h3>
               <span id="qaAvgPill" class="pill">Avg: —</span>
             </div>
 
@@ -157,63 +169,89 @@
               </div>
 
               <button type="submit" id="submitQaBtn" class="btn-secondary btn-full">
-                + Log QA Audit
+                + Add QA Monit
               </button>
             </form>
           </div>
         </div>
 
+        <!-- Right Column: Case Tracker (10 rows) + QA Monit (5 rows) -->
         <div id="panel-tables" draggable="true" class="stack-col workspace-panel">
+
           <div class="panel">
             <div class="panel-header">
-              <h3><span class="grip">⋮⋮</span> Monthly Case Ledger</h3>
-              <span id="caseCountLabel" class="muted-text">0 cases logged</span>
+              <h3 class="fancy-title"><span class="grip">⋮⋮</span> ❧ Case Tracker</h3>
+              <div class="search-box">
+                <input type="text" id="caseSearchInput" placeholder="Search Case ID or Client..." />
+                <button type="button" class="btn-primary btn-xs" id="caseSearchBtn">🔍</button>
+              </div>
             </div>
 
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Case ID</th>
-                    <th>Client</th>
-                    <th>AHT</th>
-                    <th>CSAT</th>
-                    <th>CRT NE</th>
-                    <th>Triage</th>
-                    <th class="text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="caseTableBody"></tbody>
-              </table>
+            <div class="paged-layout">
+              <!-- Vertical Left-Hand Inclined Leaf Pagination -->
+              <div id="caseLeafRail" class="leaf-rail" aria-label="Case Tracker Pages"></div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Case ID</th>
+                      <th>Client</th>
+                      <th>AHT</th>
+                      <th>CSAT</th>
+                      <th>CRT NE</th>
+                      <th>Triage</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="caseTableBody"></tbody>
+                </table>
+              </div>
             </div>
           </div>
 
           <div class="panel">
             <div class="panel-header">
-              <h3>QA Audit Log (Separate Matrix)</h3>
-              <span id="qaCountLabel" class="muted-text">0 audits logged</span>
+              <h3 class="fancy-title">✦ QA Monit</h3>
+              <span id="qaCountLabel" class="muted-text">0 monits logged</span>
             </div>
 
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Case ID</th>
-                    <th>Monit Provided By</th>
-                    <th>Score</th>
-                    <th class="text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="qaTableBody"></tbody>
-              </table>
+            <div class="paged-layout">
+              <!-- Vertical Left-Hand Inclined Leaf Pagination -->
+              <div id="qaLeafRail" class="leaf-rail" aria-label="QA Monit Pages"></div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Case ID</th>
+                      <th>Monit Provided By</th>
+                      <th>Score</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="qaTableBody"></tbody>
+                </table>
+              </div>
             </div>
           </div>
+
         </div>
 
       </section>
     </main>
   </div>
 
-  <script src="app.js"></script>
-</body>
-</html>
+  <!-- 3D Pop-Out Search Modal -->
+  <div id="searchModal" class="modal-backdrop hidden">
+    <div class="modal-3d-card">
+      <div class="panel-header">
+        <h3 class="fancy-title">✦ Case Chronicle Lookup</h3>
+        <button type="button" class="btn-icon" id="closeSearchModalBtn">✕</button>
+      </div>
+      <div id="searchResultsBody" class="search-results-list"></div>
+    </div>
+  </div>
+
+  <!-- Wallpaper Studio Modal -->
+  <div id="wallpaperModal" class="modal-backdrop hidden">
