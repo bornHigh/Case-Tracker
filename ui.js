@@ -422,21 +422,12 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); openSearchModal(searchInput.value); } });
   document.getElementById('closeSearchModalBtn').addEventListener('click', () => document.getElementById('searchModal').classList.add('hidden'));
 
-  document.getElementById('wallpaperBtn').addEventListener('click', () => document.getElementById('wallpaperModal').classList.remove('hidden'));
-  document.getElementById('closeWallpaperModalBtn').addEventListener('click', () => document.getElementById('wallpaperModal').classList.add('hidden'));
-  document.getElementById('wallpaperFileInput').addEventListener('change', e => {
-    const file = e.target.files.at(0);
-    if (!file) return;
-    const isVideo = file.type.startsWith('video/');
-    applyWallpaper(URL.createObjectURL(file), isVideo);
-    document.getElementById('wallpaperModal').classList.add('hidden');
+    document.getElementById('wallpaperBtn').addEventListener('click', () => {
+    document.getElementById('wallpaperModal').classList.remove('hidden');
+    loadRepoWallpapers();
   });
-  document.getElementById('applyWallpaperUrlBtn').addEventListener('click', () => {
-    const url = document.getElementById('wallpaperUrlInput').value.trim();
-    if (!url) return;
-    const isVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
-    applyWallpaper(url, isVideo);
-    try { localStorage.setItem(WALLPAPER_KEY, JSON.stringify({ src: url, isVideo })); } catch (err) {}
+  document.getElementById('refreshWallpapersBtn').addEventListener('click', loadRepoWallpapers);
+  document.getElementById('closeWallpaperModalBtn').addEventListener('click', () => {
     document.getElementById('wallpaperModal').classList.add('hidden');
   });
   document.getElementById('clearWallpaperBtn').addEventListener('click', () => {
@@ -444,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.removeItem(WALLPAPER_KEY); } catch (err) {}
     document.getElementById('wallpaperModal').classList.add('hidden');
   });
+
 
   document.getElementById('toggleArchivesBtn').addEventListener('click', () => { state.archivesExpanded = !state.archivesExpanded; saveState(); render(); });
   document.getElementById('startDateInput').addEventListener('change', e => { const tab = getActiveTab(); if (!tab.archived) { tab.startDate = e.target.value; saveState(); render(); } });
