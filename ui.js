@@ -1,15 +1,86 @@
+const LEAF_THEMES = [
+  { core: '#a855f7', tip: '#fbbf24', glow: 'rgba(168, 85, 247, 0.95)' },
+  { core: '#38bdf8', tip: '#a855f7', glow: 'rgba(56, 189, 248, 0.95)' },
+  { core: '#10b981', tip: '#fde047', glow: 'rgba(16, 185, 129, 0.95)' },
+  { core: '#ec4899', tip: '#fbbf24', glow: 'rgba(236, 72, 153, 0.95)' },
+  { core: '#f59e0b', tip: '#fef08a', glow: 'rgba(245, 158, 11, 0.95)' }
+];
+
+function createEtherealLeafSVG(theme, uid) {
+  const ns = 'http://w3.org';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 32 32');
+
+  const defs = document.createElementNS(ns, 'defs');
+  const grad = document.createElementNS(ns, 'linearGradient');
+  grad.setAttribute('id', uid);
+  grad.setAttribute('x1', '15%');
+  grad.setAttribute('y1', '85%');
+  grad.setAttribute('x2', '85%');
+  grad.setAttribute('y2', '15%');
+
+  const s1 = document.createElementNS(ns, 'stop');
+  s1.setAttribute('offset', '0%');
+  s1.setAttribute('stop-color', theme.core);
+  s1.setAttribute('stop-opacity', '0.55');
+
+  const s2 = document.createElementNS(ns, 'stop');
+  s2.setAttribute('offset', '75%');
+  s2.setAttribute('stop-color', theme.core);
+  s2.setAttribute('stop-opacity', '0.28');
+
+  const s3 = document.createElementNS(ns, 'stop');
+  s3.setAttribute('offset', '100%');
+  s3.setAttribute('stop-color', theme.tip);
+  s3.setAttribute('stop-opacity', '0.65');
+
+  grad.appendChild(s1);
+  grad.appendChild(s2);
+  grad.appendChild(s3);
+  defs.appendChild(grad);
+  svg.appendChild(defs);
+
+  const blade = document.createElementNS(ns, 'path');
+  blade.setAttribute('d', 'M25.5 4.5 C21 5 18 6.5 15.8 6 L15 7.8 C12.5 8 10.5 9.5 9.2 11.5 L10.5 12.6 C8.5 14.5 7.8 17 8.5 19.8 C11.5 20.5 14.5 19.8 16.8 18 L17.8 19.2 C20 17.8 21.5 15.8 22 13.5 L23.6 12.8 C24.5 10.2 25.2 7.5 25.5 4.5 Z');
+  blade.setAttribute('fill', `url(#${uid})`);
+  blade.setAttribute('stroke', theme.tip);
+  blade.setAttribute('stroke-width', '1.15');
+  blade.setAttribute('stroke-linejoin', 'round');
+
+  const veins = document.createElementNS(ns, 'path');
+  veins.setAttribute('d', 'M4.5 27.5 Q7 23.5 9.5 19.5 Q15.5 14 24.5 5.5 M12.2 17.2 Q11.2 13.5 11.5 10.5 M15.8 13.8 Q14.8 10.2 15.5 7.5 M19.2 10.5 Q18.5 7.8 19.5 5.8 M13.2 16.4 Q16.5 16.8 19.5 16.2 M16.8 13.1 Q19.8 13.4 22.2 12.5 M19.8 9.8 Q22.2 9.8 24 8.8');
+  veins.setAttribute('stroke', '#ffffff');
+  veins.setAttribute('stroke-width', '0.95');
+  veins.setAttribute('stroke-linecap', 'round');
+  veins.setAttribute('fill', 'none');
+
+  const node = document.createElementNS(ns, 'circle');
+  node.setAttribute('cx', '9.5');
+  node.setAttribute('cy', '19.5');
+  node.setAttribute('r', '1.6');
+  node.setAttribute('fill', '#ffffff');
+
+  svg.appendChild(blade);
+  svg.appendChild(veins);
+  svg.appendChild(node);
+  return svg;
+}
+
 function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const rail = document.getElementById(railId);
   clearEl(rail);
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   for (let p = 0; p < totalPages; p++) {
+    const theme = LEAF_THEMES[p % LEAF_THEMES.length];
     const leaf = makeEl('button', 'leaf-btn' + (p === currentPage ? ' active' : ''));
     leaf.type = 'button';
-    leaf.style.background = LEAF_GRADIENTS[p % LEAF_GRADIENTS.length];
+    leaf.style.setProperty('--leaf-glow', theme.glow);
+    leaf.appendChild(createEtherealLeafSVG(theme, `${railId}_g_${p}`));
     leaf.onclick = () => onSelect(p);
     rail.appendChild(leaf);
   }
 }
+
 
 function makeMonthButton(t, activeId) {
   const btn = makeEl('button', 'month-btn' + (t.id === activeId ? ' active' : ''));
