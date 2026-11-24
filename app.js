@@ -1,4 +1,16 @@
-const STORAGE_KEY = 'caseflow_kpi_v1';
+const STORAGE_KEY = 'caseflow_arcane_v1';
+const WALLPAPER_KEY = 'caseflow_arcane_wallpaper';
+const CASE_PAGE_SIZE = 10;
+const QA_PAGE_SIZE = 5;
+
+const LEAF_GRADIENTS = [
+  'linear-gradient(135deg, #10b981, #059669)',
+  'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+  'linear-gradient(135deg, #f59e0b, #d97706)',
+  'linear-gradient(135deg, #ec4899, #db2777)',
+  'linear-gradient(135deg, #06b6d4, #0284c7)',
+  'linear-gradient(135deg, #84cc16, #4d7c0f)'
+];
 
 function getCurrentMonthLabel(offset = 0) {
   const d = new Date();
@@ -32,9 +44,9 @@ const defaultState = {
       endDate: initialRange.end,
       archived: false,
       cases: [
-        { id: 'CASE-1001', client: 'Nordic Retail', aht: 24.5, csat: 'Positive', crt: 'Saved', triage: 'Saved' },
-        { id: 'CASE-1002', client: 'Veloce Tech', aht: 29.0, csat: 'Positive', crt: 'Saved', triage: 'Saved' },
-        { id: 'CASE-1003', client: 'Atlas Logistics', aht: 31.0, csat: 'Positive', crt: 'Saved', triage: 'Saved' }
+        { id: 'CASE-1001', client: 'Nordic Retail', aht: 24.5, csat: 'Positive', crt: 'Saved', triage: 'Saved', remark: 'Customer thanked us for same-day resolution.' },
+        { id: 'CASE-1002', client: 'Veloce Tech', aht: 29.0, csat: 'Positive', crt: 'Saved', triage: 'Saved', remark: '' },
+        { id: 'CASE-1003', client: 'Atlas Logistics', aht: 31.0, csat: 'Positive', crt: 'Saved', triage: 'Saved', remark: '' }
       ],
       qaAudits: [
         { id: 'CASE-1001', auditor: 'Sarah M.', score: 96 },
@@ -45,8 +57,11 @@ const defaultState = {
 };
 
 let state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
+let casePage = 0;
+let qaPage = 0;
 let editingCaseIdx = null;
 let editingQaIdx = null;
+let expandedRemarkIdx = null;
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -111,12 +126,28 @@ function makeEl(tag, className, text) {
   if (text !== undefined) el.textContent = text;
   return el;
 }
+function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
+  const rail = document.getElementById(railId);
+  clearEl(rail);
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  for (let p = 0; p < totalPages; p++) {
+    const leaf = makeEl('button', 'leaf-btn' + (p === currentPage ? ' active' : ''));
+    leaf.type = 'button';
+    leaf.style.background = LEAF_GRADIENTS[p % LEAF_GRADIENTS.length];
+    leaf.onclick = () => onSelect(p);
+    rail.appendChild(leaf);
+  }
+}
+
 function makeMonthButton(t, activeId) {
   const btn = makeEl('button', 'month-btn' + (t.id === activeId ? ' active' : ''));
   btn.type = 'button';
   btn.onclick = () => {
+    casePage = 0;
+    qaPage = 0;
     editingCaseIdx = null;
     editingQaIdx = null;
+    expandedRemarkIdx = null;
     state.activeTabId = t.id;
     saveState();
     render();
@@ -127,7 +158,7 @@ function makeMonthButton(t, activeId) {
   title.style.fontWeight = '600';
   const sub = makeEl('div', '', `${t.startDate || ''} to ${t.endDate || ''}`);
   sub.style.fontSize = '10px';
-  sub.style.opacity = '0.8';
+  sub.style.opacity = '0.85';
   left.appendChild(title);
   left.appendChild(sub);
 
@@ -190,7 +221,7 @@ function renderSidebarAndCards(tab, m) {
     quality: {
       title: 'Quality Score (QA)',
       value: m.avgQual !== null ? `${m.avgQual.toFixed(1)}%` : '—',
-      sub: `Bonus: +€${m.qualBonus} (${tab.qaAudits.length} audits)`,
+      sub: `Bonus: +€${m.qualBonus} (${tab.qaAudits.length} monits)`,
       color: m.avgQual !== null && m.avgQual >= 90 ? 'txt-green' : ''
     },
     crt: {
@@ -230,9 +261,17 @@ function buildSelect(options, currentVal) {
   });
   return sel;
 }
+function renderCaseTable(tab) {
+  const totalPages = Math.max(1, Math.ceil(tab.cases.length / CASE_PAGE_SIZE));
+  if (casePage >= totalPages) casePage = totalPages - 1;
 
-function renderTables(tab) {
-  document.getElementById('caseCountLabel').textContent = `${tab.cases.length} cases logged`;
+  renderLeafRail('caseLeafRail', tab.cases.length, CASE_PAGE_SIZE, casePage, p => {
+    casePage = p;
+    editingCaseIdx = null;
+    expandedRemarkIdx = null;
+    render();
+  });
+
   const tbody = document.getElementById('caseTableBody');
   clearEl(tbody);
 
@@ -241,152 +280,217 @@ function renderTables(tab) {
     const td = makeEl('td', 'muted-text', `No cases logged for ${tab.name} yet.`);
     td.colSpan = 7;
     td.style.textAlign = 'center';
-    td.style.padding = '22px';
+    td.style.padding = '24px';
     tr.appendChild(td);
     tbody.appendChild(tr);
-  } else {
-    tab.cases.forEach((c, idx) => {
-      const tr = makeEl('tr');
-      if (!tab.archived && editingCaseIdx === idx) {
-        const inId = makeEl('input', 'inline-input'); inId.value = c.id;
-        const inClient = makeEl('input', 'inline-input'); inClient.value = c.client || '';
-        const inAht = makeEl('input', 'inline-input'); inAht.type = 'number'; inAht.step = '0.1'; inAht.value = c.aht;
-        const selCsat = buildSelect(['Positive', 'Negative', 'Pending'], c.csat);
-        const selCrt = buildSelect(['Saved', 'Lost', 'N/A'], c.crt);
-        const selTri = buildSelect(['Saved', 'Lost', 'N/A'], c.triage);
+    return;
+  }
 
-        const tdAct = makeEl('td', 'text-right');
-        const grp = makeEl('div', 'action-group');
-        const saveBtn = makeEl('button', 'btn-save', '✓');
-        saveBtn.type = 'button';
-        saveBtn.onclick = () => {
-          tab.cases.splice(idx, 1, {
-            id: inId.value.trim() || c.id,
-            client: inClient.value.trim() || '—',
-            aht: parseFloat(inAht.value) || 0,
-            csat: selCsat.value,
-            crt: selCrt.value,
-            triage: selTri.value
-          });
-          editingCaseIdx = null;
+  const start = casePage * CASE_PAGE_SIZE;
+  const slice = tab.cases.slice(start, start + CASE_PAGE_SIZE);
+
+  slice.forEach((c, localIdx) => {
+    const globalIdx = start + localIdx;
+    const tr = makeEl('tr');
+
+    if (!tab.archived && editingCaseIdx === globalIdx) {
+      const inId = makeEl('input', 'inline-input'); inId.value = c.id;
+      const inClient = makeEl('input', 'inline-input'); inClient.value = c.client || '';
+      const inAht = makeEl('input', 'inline-input'); inAht.type = 'number'; inAht.step = '0.1'; inAht.value = c.aht;
+      const selCsat = buildSelect(['Positive', 'Negative', 'Pending'], c.csat);
+      const selCrt = buildSelect(['Saved', 'Lost', 'N/A'], c.crt);
+      const selTri = buildSelect(['Saved', 'Lost', 'N/A'], c.triage);
+
+      const tdAct = makeEl('td', 'text-right');
+      const grp = makeEl('div', 'action-group');
+      const saveBtn = makeEl('button', 'btn-save', '✓');
+      saveBtn.type = 'button';
+      saveBtn.onclick = () => {
+        tab.cases.splice(globalIdx, 1, {
+          id: inId.value.trim() || c.id,
+          client: inClient.value.trim() || '—',
+          aht: parseFloat(inAht.value) || 0,
+          csat: selCsat.value,
+          crt: selCrt.value,
+          triage: selTri.value,
+          remark: c.remark || ''
+        });
+        editingCaseIdx = null;
+        saveState();
+        render();
+      };
+      const cancelBtn = makeEl('button', 'btn-icon', '✕');
+      cancelBtn.type = 'button';
+      cancelBtn.onclick = () => { editingCaseIdx = null; render(); };
+      grp.appendChild(saveBtn);
+      grp.appendChild(cancelBtn);
+      tdAct.appendChild(grp);
+
+      [inId, inClient, inAht, selCsat, selCrt, selTri].forEach(el => {
+        const td = makeEl('td'); td.appendChild(el); tr.appendChild(td);
+      });
+      tr.appendChild(tdAct);
+    } else {
+      const tdId = makeEl('td', '', c.id); tdId.style.fontWeight = '700';
+      const tdClient = makeEl('td', '', c.client || '—');
+      const tdAht = makeEl('td', c.aht > 32 ? 'txt-red' : '', `${c.aht}m`);
+      const tdCsat = makeEl('td');
+      const tagClass = c.csat === 'Positive' ? 'tag-pos' : c.csat === 'Negative' ? 'tag-neg' : 'tag-neu';
+      tdCsat.appendChild(makeEl('span', 'status-tag ' + tagClass, c.csat));
+      const tdCrt = makeEl('td', '', c.crt);
+      const tdTri = makeEl('td', '', c.triage);
+
+      const tdAct = makeEl('td', 'text-right');
+      const grp = makeEl('div', 'action-group');
+
+      // Expandable Written Remarks Button
+      const hasNote = c.remark && c.remark.trim().length > 0;
+      const noteBtn = makeEl('button', 'btn-icon' + (hasNote ? ' has-note' : ''), '💬');
+      noteBtn.type = 'button';
+      noteBtn.title = 'Toggle Written Remarks';
+      noteBtn.onclick = () => {
+        expandedRemarkIdx = (expandedRemarkIdx === globalIdx) ? null : globalIdx;
+        render();
+      };
+      grp.appendChild(noteBtn);
+
+      if (!tab.archived) {
+        const editBtn = makeEl('button', 'btn-icon', '✏️');
+        editBtn.type = 'button';
+        editBtn.title = 'Edit Entry';
+        editBtn.onclick = () => { editingCaseIdx = globalIdx; render(); };
+
+        const delBtn = makeEl('button', 'btn-del', '✕');
+        delBtn.type = 'button';
+        delBtn.title = 'Delete Entry';
+        delBtn.onclick = () => { tab.cases.splice(globalIdx, 1); saveState(); render(); };
+
+        grp.appendChild(editBtn);
+        grp.appendChild(delBtn);
+      }
+      tdAct.appendChild(grp);
+      [tdId, tdClient, tdAht, tdCsat, tdCrt, tdTri, tdAct].forEach(td => tr.appendChild(td));
+    }
+    tbody.appendChild(tr);
+
+    // Expanded Remarks Drawer Row
+    if (expandedRemarkIdx === globalIdx) {
+      const rTr = makeEl('tr', 'remark-drawer-row');
+      const rTd = makeEl('td');
+      rTd.colSpan = 7;
+
+      const box = makeEl('div', 'remark-drawer-box');
+      const area = makeEl('textarea');
+      area.placeholder = 'Write case remarks or notes here...';
+      area.value = c.remark || '';
+      area.disabled = tab.archived;
+
+      box.appendChild(area);
+      if (!tab.archived) {
+        const saveNoteBtn = makeEl('button', 'btn-primary btn-xs', 'Save Note');
+        saveNoteBtn.type = 'button';
+        saveNoteBtn.onclick = () => {
+          c.remark = area.value.trim();
           saveState();
           render();
         };
-        const cancelBtn = makeEl('button', 'btn-icon', '✕');
-        cancelBtn.type = 'button';
-        cancelBtn.onclick = () => { editingCaseIdx = null; render(); };
-        grp.appendChild(saveBtn);
-        grp.appendChild(cancelBtn);
-        tdAct.appendChild(grp);
-
-        [inId, inClient, inAht, selCsat, selCrt, selTri].forEach(el => {
-          const td = makeEl('td'); td.appendChild(el); tr.appendChild(td);
-        });
-        tr.appendChild(tdAct);
-      } else {
-        const tdId = makeEl('td', '', c.id); tdId.style.fontWeight = '600';
-        const tdClient = makeEl('td', '', c.client || '—');
-        const tdAht = makeEl('td', c.aht > 32 ? 'txt-red' : '', `${c.aht}m`);
-        const tdCsat = makeEl('td');
-        const tagClass = c.csat === 'Positive' ? 'tag-pos' : c.csat === 'Negative' ? 'tag-neg' : 'tag-neu';
-        tdCsat.appendChild(makeEl('span', 'status-tag ' + tagClass, c.csat));
-        const tdCrt = makeEl('td', '', c.crt);
-        const tdTri = makeEl('td', '', c.triage);
-
-        const tdAct = makeEl('td', 'text-right');
-        if (tab.archived) {
-          tdAct.appendChild(makeEl('span', 'muted-text', 'Locked'));
-        } else {
-          const grp = makeEl('div', 'action-group');
-          const editBtn = makeEl('button', 'btn-icon', '✏️');
-          editBtn.type = 'button';
-          editBtn.title = 'Edit Entry';
-          editBtn.onclick = () => { editingCaseIdx = idx; render(); };
-
-          const delBtn = makeEl('button', 'btn-del', 'Remove');
-          delBtn.type = 'button';
-          delBtn.onclick = () => { tab.cases.splice(idx, 1); saveState(); render(); };
-
-          grp.appendChild(editBtn);
-          grp.appendChild(delBtn);
-          tdAct.appendChild(grp);
-        }
-        [tdId, tdClient, tdAht, tdCsat, tdCrt, tdTri, tdAct].forEach(td => tr.appendChild(td));
+        box.appendChild(saveNoteBtn);
       }
-      tbody.appendChild(tr);
-    });
-  }
+      rTd.appendChild(box);
+      rTr.appendChild(rTd);
+      tbody.appendChild(rTr);
+    }
+  });
+}
 
-  // Render QA Audits Table
-  document.getElementById('qaCountLabel').textContent = `${tab.qaAudits.length} audits logged`;
+function renderQaTable(tab) {
+  document.getElementById('qaCountLabel').textContent = `${tab.qaAudits.length} monits logged`;
+  const totalPages = Math.max(1, Math.ceil(tab.qaAudits.length / QA_PAGE_SIZE));
+  if (qaPage >= totalPages) qaPage = totalPages - 1;
+
+  renderLeafRail('qaLeafRail', tab.qaAudits.length, QA_PAGE_SIZE, qaPage, p => {
+    qaPage = p;
+    editingQaIdx = null;
+    render();
+  });
+
   const qaBody = document.getElementById('qaTableBody');
   clearEl(qaBody);
 
   if (!tab.qaAudits.length) {
     const tr = makeEl('tr');
-    const td = makeEl('td', 'muted-text', 'No QA audits logged yet (does not penalize bonus).');
+    const td = makeEl('td', 'muted-text', 'No QA monits logged yet.');
     td.colSpan = 4;
     td.style.textAlign = 'center';
     td.style.padding = '20px';
     tr.appendChild(td);
     qaBody.appendChild(tr);
-  } else {
-    tab.qaAudits.forEach((q, idx) => {
-      const tr = makeEl('tr');
-      if (!tab.archived && editingQaIdx === idx) {
-        const inId = makeEl('input', 'inline-input'); inId.value = q.id;
-        const inAud = makeEl('input', 'inline-input'); inAud.value = q.auditor;
-        const inScore = makeEl('input', 'inline-input'); inScore.type = 'number'; inScore.step = '0.1'; inScore.value = q.score;
+    return;
+  }
 
-        const tdAct = makeEl('td', 'text-right');
-        const grp = makeEl('div', 'action-group');
-        const saveBtn = makeEl('button', 'btn-save', '✓');
-        saveBtn.type = 'button';
-        saveBtn.onclick = () => {
-          tab.qaAudits.splice(idx, 1, {
-            id: inId.value.trim() || q.id,
-            auditor: inAud.value.trim() || q.auditor,
-            score: parseFloat(inScore.value) || 0
-          });
-          editingQaIdx = null;
-          saveState();
-          render();
-        };
-        const cancelBtn = makeEl('button', 'btn-icon', '✕');
-        cancelBtn.type = 'button';
-        cancelBtn.onclick = () => { editingQaIdx = null; render(); };
-        grp.appendChild(saveBtn);
-        grp.appendChild(cancelBtn);
-        tdAct.appendChild(grp);
+  const start = qaPage * QA_PAGE_SIZE;
+  const slice = tab.qaAudits.slice(start, start + QA_PAGE_SIZE);
 
-        [inId, inAud, inScore].forEach(el => {
-          const td = makeEl('td'); td.appendChild(el); tr.appendChild(td);
+  slice.forEach((q, localIdx) => {
+    const globalIdx = start + localIdx;
+    const tr = makeEl('tr');
+
+    if (!tab.archived && editingQaIdx === globalIdx) {
+      const inId = makeEl('input', 'inline-input'); inId.value = q.id;
+      const inAud = makeEl('input', 'inline-input'); inAud.value = q.auditor;
+      const inScore = makeEl('input', 'inline-input'); inScore.type = 'number'; inScore.step = '0.1'; inScore.value = q.score;
+
+      const tdAct = makeEl('td', 'text-right');
+      const grp = makeEl('div', 'action-group');
+      const saveBtn = makeEl('button', 'btn-save', '✓');
+      saveBtn.type = 'button';
+      saveBtn.onclick = () => {
+        tab.qaAudits.splice(globalIdx, 1, {
+          id: inId.value.trim() || q.id,
+          auditor: inAud.value.trim() || q.auditor,
+          score: parseFloat(inScore.value) || 0
         });
-        tr.appendChild(tdAct);
-} else {
-const tdId = makeEl('td', '', q.id); tdId.style.fontWeight = '600';
-const tdAud = makeEl('td', '', q.auditor);
-const tdScore = makeEl('td', q.score >= 90 ? 'txt-green' : 'txt-amber', ${q.score}%);
-const tdAct = makeEl('td', 'text-right');
-if (tab.archived) {
-tdAct.appendChild(makeEl('span', 'muted-text', 'Locked'));
-} else {
-const grp = makeEl('div', 'action-group');
-const editBtn = makeEl('button', 'btn-icon', '✏️');
-editBtn.type = 'button';
-editBtn.onclick = () => { editingQaIdx = idx; render(); };
-const delBtn = makeEl('button', 'btn-del', 'Remove');
-delBtn.type = 'button';
-delBtn.onclick = () => { tab.qaAudits.splice(idx, 1); saveState(); render(); };
-grp.appendChild(editBtn);
-grp.appendChild(delBtn);
-tdAct.appendChild(grp);
-}
-[tdId, tdAud, tdScore, tdAct].forEach(td => tr.appendChild(td));
-}
-qaBody.appendChild(tr);
-});
-}
+        editingQaIdx = null;
+        saveState();
+        render();
+      };
+      const cancelBtn = makeEl('button', 'btn-icon', '✕');
+      cancelBtn.type = 'button';
+      cancelBtn.onclick = () => { editingQaIdx = null; render(); };
+      grp.appendChild(saveBtn);
+      grp.appendChild(cancelBtn);
+      tdAct.appendChild(grp);
+
+      [inId, inAud, inScore].forEach(el => {
+        const td = makeEl('td'); td.appendChild(el); tr.appendChild(td);
+      });
+      tr.appendChild(tdAct);
+    } else {
+      const tdId = makeEl('td', '', q.id); tdId.style.fontWeight = '700';
+      const tdAud = makeEl('td', '', q.auditor);
+      const tdScore = makeEl('td', q.score >= 90 ? 'txt-green' : 'txt-amber', `${q.score}%`);
+      const tdAct = makeEl('td', 'text-right');
+
+      if (tab.archived) {
+        tdAct.appendChild(makeEl('span', 'muted-text', 'Locked'));
+      } else {
+        const grp = makeEl('div', 'action-group');
+        const editBtn = makeEl('button', 'btn-icon', '✏️');
+        editBtn.type = 'button';
+        editBtn.onclick = () => { editingQaIdx = globalIdx; render(); };
+
+        const delBtn = makeEl('button', 'btn-del', '✕');
+        delBtn.type = 'button';
+        delBtn.onclick = () => { tab.qaAudits.splice(globalIdx, 1); saveState(); render(); };
+
+        grp.appendChild(editBtn);
+        grp.appendChild(delBtn);
+        tdAct.appendChild(grp);
+      }
+      [tdId, tdAud, tdScore, tdAct].forEach(td => tr.appendChild(td));
+    }
+    qaBody.appendChild(tr);
+  });
 }
 function render() {
   const tab = getActiveTab();
@@ -399,8 +503,69 @@ function render() {
     if (el) panelsContainer.appendChild(el);
   });
 
-  renderTables(tab);
+  renderCaseTable(tab);
+  renderQaTable(tab);
   bindDragAndDrop();
+}
+
+function applyWallpaper(src, isVideo) {
+  const imgEl = document.getElementById('bgImage');
+  const vidEl = document.getElementById('bgVideo');
+  if (!src) {
+    imgEl.classList.add('hidden');
+    vidEl.classList.add('hidden');
+    vidEl.removeAttribute('src');
+    imgEl.removeAttribute('src');
+    return;
+  }
+  if (isVideo) {
+    imgEl.classList.add('hidden');
+    vidEl.src = src;
+    vidEl.classList.remove('hidden');
+    vidEl.play().catch(() => {});
+  } else {
+    vidEl.classList.add('hidden');
+    imgEl.src = src;
+    imgEl.classList.remove('hidden');
+  }
+}
+
+function openSearchModal(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return;
+  const tab = getActiveTab();
+  const matches = tab.cases.filter(c =>
+    (c.id && c.id.toLowerCase().includes(q)) ||
+    (c.client && c.client.toLowerCase().includes(q))
+  );
+
+  const container = document.getElementById('searchResultsBody');
+  clearEl(container);
+
+  if (!matches.length) {
+    container.appendChild(makeEl('p', 'muted-text', `No matching cases found for "${query}" in ${tab.name}.`));
+  } else {
+    matches.forEach(c => {
+      const card = makeEl('div', 'search-hit-card');
+      const header = makeEl('div', 'panel-header');
+      header.style.marginBottom = '4px';
+      header.appendChild(makeEl('strong', '', `${c.id} — ${c.client || 'No Client'}`));
+      header.appendChild(makeEl('span', 'pill', c.csat));
+
+      const grid = makeEl('div', 'search-hit-grid');
+      grid.appendChild(makeEl('div', '', `AHT: ${c.aht} mins`));
+      grid.appendChild(makeEl('div', '', `CRT NE: ${c.crt}`));
+      grid.appendChild(makeEl('div', '', `Triage: ${c.triage}`));
+
+      card.appendChild(header);
+      card.appendChild(grid);
+      if (c.remark) {
+        card.appendChild(makeEl('div', 'search-hit-remark', `💬 Remarks: ${c.remark}`));
+      }
+      container.appendChild(card);
+    });
+  }
+  document.getElementById('searchModal').classList.remove('hidden');
 }
 
 function bindDragAndDrop() {
@@ -442,8 +607,10 @@ function bindDragAndDrop() {
     });
   });
 }
-
 document.addEventListener('DOMContentLoaded', () => {
+  const savedWp = JSON.parse(localStorage.getItem(WALLPAPER_KEY) || 'null');
+  if (savedWp && savedWp.src) applyWallpaper(savedWp.src, savedWp.isVideo);
+
   document.getElementById('caseForm').addEventListener('submit', e => {
     e.preventDefault();
     const tab = getActiveTab();
@@ -454,8 +621,10 @@ document.addEventListener('DOMContentLoaded', () => {
       aht: parseFloat(document.getElementById('ahtInput').value),
       csat: document.getElementById('csatInput').value,
       crt: document.getElementById('crtInput').value,
-      triage: document.getElementById('triageInput').value
+      triage: document.getElementById('triageInput').value,
+      remark: ''
     });
+    casePage = 0;
     e.target.reset();
     saveState();
     render();
@@ -470,9 +639,52 @@ document.addEventListener('DOMContentLoaded', () => {
       auditor: document.getElementById('qaAuditorInput').value.trim(),
       score: parseFloat(document.getElementById('qaScoreInput').value)
     });
+    qaPage = 0;
     e.target.reset();
     saveState();
     render();
+  });
+
+  const searchInput = document.getElementById('caseSearchInput');
+  document.getElementById('caseSearchBtn').addEventListener('click', () => openSearchModal(searchInput.value));
+  searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); openSearchModal(searchInput.value); }
+  });
+  document.getElementById('closeSearchModalBtn').addEventListener('click', () => {
+    document.getElementById('searchModal').classList.add('hidden');
+  });
+
+  document.getElementById('wallpaperBtn').addEventListener('click', () => {
+    document.getElementById('wallpaperModal').classList.remove('hidden');
+  });
+  document.getElementById('closeWallpaperModalBtn').addEventListener('click', () => {
+    document.getElementById('wallpaperModal').classList.add('hidden');
+  });
+  document.getElementById('wallpaperFileInput').addEventListener('change', e => {
+    const file = e.target.files.at(0);
+    if (!file) return;
+    const isVideo = file.type.startsWith('video/');
+    const blobUrl = URL.createObjectURL(file);
+    applyWallpaper(blobUrl, isVideo);
+    if (!isVideo && file.size < 2500000) {
+      const reader = new FileReader();
+      reader.onload = () => localStorage.setItem(WALLPAPER_KEY, JSON.stringify({ src: reader.result, isVideo: false }));
+      reader.readAsDataURL(file);
+    }
+    document.getElementById('wallpaperModal').classList.add('hidden');
+  });
+  document.getElementById('applyWallpaperUrlBtn').addEventListener('click', () => {
+    const url = document.getElementById('wallpaperUrlInput').value.trim();
+    if (!url) return;
+    const isVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
+    applyWallpaper(url, isVideo);
+    localStorage.setItem(WALLPAPER_KEY, JSON.stringify({ src: url, isVideo }));
+    document.getElementById('wallpaperModal').classList.add('hidden');
+  });
+  document.getElementById('clearWallpaperBtn').addEventListener('click', () => {
+    applyWallpaper(null, false);
+    localStorage.removeItem(WALLPAPER_KEY);
+    document.getElementById('wallpaperModal').classList.add('hidden');
   });
 
   document.getElementById('toggleArchivesBtn').addEventListener('click', () => {
@@ -485,7 +697,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const tab = getActiveTab();
     if (!tab.archived) { tab.startDate = e.target.value; saveState(); render(); }
   });
-
   document.getElementById('endDateInput').addEventListener('change', e => {
     const tab = getActiveTab();
     if (!tab.archived) { tab.endDate = e.target.value; saveState(); render(); }
@@ -500,17 +711,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const customStart = prompt('Start Date (YYYY-MM-DD):', range.start) || range.start;
     const customEnd = prompt('End Date (YYYY-MM-DD):', range.end) || range.end;
     current.archived = true;
-    editingCaseIdx = null;
-    editingQaIdx = null;
+    casePage = 0; qaPage = 0; editingCaseIdx = null; editingQaIdx = null; expandedRemarkIdx = null;
     const newId = 'tab-' + Date.now();
     state.tabs.unshift({
-      id: newId,
-      name: nextName.trim(),
-      startDate: customStart.trim(),
-      endDate: customEnd.trim(),
-      archived: false,
-      cases: [],
-      qaAudits: []
+      id: newId, name: nextName.trim(), startDate: customStart.trim(), endDate: customEnd.trim(),
+      archived: false, cases: [], qaAudits: []
     });
     state.activeTabId = newId;
     saveState();
@@ -520,8 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('returnActiveBtn').addEventListener('click', () => {
     const active = state.tabs.find(t => !t.archived);
     if (active) {
-      editingCaseIdx = null;
-      editingQaIdx = null;
+      casePage = 0; qaPage = 0; editingCaseIdx = null; editingQaIdx = null; expandedRemarkIdx = null;
       state.activeTabId = active.id;
       saveState();
       render();
@@ -537,14 +741,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('exportBtn').addEventListener('click', () => {
     const tab = getActiveTab();
-    const headers = ['Case ID', 'Client', 'AHT', 'CSAT', 'CRT NE', 'Triage'];
-    const rows = tab.cases.map(c => [c.id, c.client || '', c.aht, c.csat, c.crt, c.triage]);
+    const headers = ['Case ID', 'Client', 'AHT', 'CSAT', 'CRT NE', 'Triage', 'Remarks'];
+    const rows = tab.cases.map(c => [c.id, c.client || '', c.aht, c.csat, c.crt, c.triage, `"${(c.remark || '').replace(/"/g, '""')}"`]);
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${tab.name.replace(/\s+/g, '_')}_CaseFlow_Log.csv`;
+    a.download = `${tab.name.replace(/\s+/g, '_')}_CaseFlow_Arcane.csv`;
     a.click();
   });
 
