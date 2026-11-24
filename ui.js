@@ -333,23 +333,23 @@ async function loadRepoWallpapers() {
   const grid = document.getElementById('repoWallpaperGrid');
   if (!grid) return;
   clearEl(grid);
-  grid.appendChild(makeEl('p', 'muted-text', 'Fetching from GitHub wallpapers/ folder...'));
+  grid.appendChild(makeEl('p', 'muted-text', 'Loading wallpapers...'));
 
   try {
-    const res = await fetch('https://github.com');
-    if (!res.ok) throw new Error('Folder not found');
-    const files = await res.json();
-    const media = files.filter(f => /\.(jpg|jpeg|png|webp|gif|mp4|webm)$/i.test(f.name));
+    const res = await fetch('./wallpapers/list.json?t=' + Date.now());
+    if (!res.ok) throw new Error('list.json not found');
+    const filenames = await res.json();
+    const media = filenames.filter(name => /\.(jpg|jpeg|png|webp|gif|mp4|webm)$/i.test(name));
 
     clearEl(grid);
     if (!media.length) {
-      grid.appendChild(makeEl('p', 'muted-text', 'No images or videos found in wallpapers/ yet.'));
+      grid.appendChild(makeEl('p', 'muted-text', 'No images or videos listed in wallpapers/list.json yet.'));
       return;
     }
 
-    media.forEach(file => {
-      const isVideo = /\.(mp4|webm)$/i.test(file.name);
-      const liveUrl = `https://github.io{encodeURIComponent(file.name)}`;
+    media.forEach(fileName => {
+      const isVideo = /\.(mp4|webm)$/i.test(fileName);
+      const liveUrl = `./wallpapers/${encodeURIComponent(fileName)}`;
 
       const card = makeEl('button', 'wp-card');
       card.type = 'button';
@@ -365,11 +365,11 @@ async function loadRepoWallpapers() {
       } else {
         const img = makeEl('img', 'wp-thumb');
         img.src = liveUrl;
-        img.alt = file.name;
+        img.alt = fileName;
         card.appendChild(img);
       }
 
-      card.appendChild(makeEl('div', 'wp-label', (isVideo ? '🎬 ' : '🖼️ ') + file.name));
+      card.appendChild(makeEl('div', 'wp-label', (isVideo ? '🎬 ' : '🖼️ ') + fileName));
       card.onclick = () => {
         applyWallpaper(liveUrl, isVideo);
         try { localStorage.setItem(WALLPAPER_KEY, JSON.stringify({ src: liveUrl, isVideo })); } catch (err) {}
@@ -379,9 +379,10 @@ async function loadRepoWallpapers() {
     });
   } catch (err) {
     clearEl(grid);
-    grid.appendChild(makeEl('p', 'muted-text', 'Create a "wallpapers" folder in your GitHub repo and upload photos/videos there first.'));
+    grid.appendChild(makeEl('p', 'muted-text', 'Create wallpapers/list.json with your filenames (e.g. ["bg.jpg"]).'));
   }
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
   try {
