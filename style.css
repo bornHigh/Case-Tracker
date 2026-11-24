@@ -30,25 +30,9 @@ body {
 .fancy-title { font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.03em; }
 .hidden { display: none !important; }
 
-/* Live Photo / Video Wallpaper Layer */
-.wallpaper-layer {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  overflow: hidden;
-}
-.wallpaper-layer video,
-.wallpaper-layer img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.wallpaper-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(9, 13, 26, 0.78), rgba(23, 17, 46, 0.72));
-}
+.wallpaper-layer { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.wallpaper-layer video, .wallpaper-layer img { width: 100%; height: 100%; object-fit: cover; }
+.wallpaper-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(9, 13, 26, 0.78), rgba(23, 17, 46, 0.72)); }
 
 header {
   background: rgba(13, 18, 34, 0.88);
@@ -85,11 +69,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border); }
 .btn-secondary:hover:not(:disabled) { background: rgba(124, 58, 237, 0.25); border-color: #a78bfa; }
-.btn-primary {
-  background: linear-gradient(135deg, #7c3aed, #6366f1);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
-}
+.btn-primary { background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff; box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4); }
 .btn-primary:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
 .btn-xs { padding: 6px 10px; font-size: 12px; }
 .btn-full { width: 100%; margin-top: 4px; }
@@ -207,30 +187,14 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   background: rgba(124, 58, 237, 0.25); color: #ddd6fe; border: 1px solid rgba(167, 139, 250, 0.4);
 }
 
-/* Search Bar in Case Tracker */
 .search-box { display: flex; align-items: center; gap: 6px; }
 .search-box input { width: 195px; padding: 6px 10px; font-size: 12px; }
 
-/* Left-Hand Vertical Inclined Leaf Pagination Layout */
-.paged-layout {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.leaf-rail {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 6px 2px;
-  flex-shrink: 0;
-  min-width: 24px;
-}
+.paged-layout { display: flex; align-items: flex-start; gap: 12px; }
+.leaf-rail { display: flex; flex-direction: column; gap: 10px; padding: 6px 2px; flex-shrink: 0; min-width: 24px; }
 
 .leaf-btn {
-  width: 18px;
-  height: 26px;
-  padding: 0;
+  width: 18px; height: 26px; padding: 0;
   border-radius: 0 75% 0 75%;
   transform: rotate(-18deg);
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -238,16 +202,8 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   opacity: 0.62;
   transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
 }
-.leaf-btn:hover {
-  opacity: 0.95;
-  transform: rotate(-8deg) scale(1.12);
-}
-.leaf-btn.active {
-  opacity: 1;
-  transform: rotate(-5deg) scale(1.22);
-  border-color: #fff;
-  box-shadow: 0 0 14px rgba(255, 255, 255, 0.65);
-}
+.leaf-btn:hover { opacity: 0.95; transform: rotate(-8deg) scale(1.12); }
+.leaf-btn.active { opacity: 1; transform: rotate(-5deg) scale(1.22); border-color: #fff; box-shadow: 0 0 14px rgba(255, 255, 255, 0.65); }
 
 .form-group { margin-bottom: 12px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -268,12 +224,7 @@ th {
 td { padding: 9px 10px; border-bottom: 1px solid rgba(139, 92, 246, 0.16); vertical-align: middle; }
 tr:hover td { background: rgba(124, 58, 237, 0.12); }
 
-/* Expandable Remarks Drawer Row */
-.remark-drawer-row td {
-  background: rgba(15, 20, 38, 0.92) !important;
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(167, 139, 250, 0.35);
-}
+.remark-drawer-row td { background: rgba(15, 20, 38, 0.92) !important; padding: 12px 14px; border-bottom: 1px solid rgba(167, 139, 250, 0.35); }
 .remark-drawer-box { display: flex; gap: 10px; align-items: center; }
 .remark-drawer-box textarea { min-height: 44px; resize: vertical; font-size: 12px; }
 
@@ -294,28 +245,17 @@ tr:hover td { background: rgba(124, 58, 237, 0.12); }
 .muted-text { font-size: 12px; color: var(--text-muted); }
 .text-right { text-align: right; }
 
-/* 3D Pop-Out Search & Wallpaper Modals */
 .modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(5, 8, 18, 0.65);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 50;
-  perspective: 1100px;
+  position: fixed; inset: 0; background: rgba(5, 8, 18, 0.65);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 50; perspective: 1100px;
 }
 
 .modal-3d-card {
-  width: 100%;
-  max-width: 620px;
+  width: 100%; max-width: 620px;
   background: linear-gradient(145deg, rgba(24, 31, 56, 0.96), rgba(13, 18, 34, 0.98));
-  border: 1px solid rgba(167, 139, 250, 0.55);
-  border-radius: 18px;
-  padding: 22px;
+  border: 1px solid rgba(167, 139, 250, 0.55); border-radius: 18px; padding: 22px;
   box-shadow: 0 28px 65px rgba(0, 0, 0, 0.75), 0 0 30px rgba(124, 58, 237, 0.35);
   animation: pop3D 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -326,12 +266,7 @@ tr:hover td { background: rgba(124, 58, 237, 0.12); }
 }
 
 .search-results-list { display: flex; flex-direction: column; gap: 12px; max-height: 65vh; overflow-y: auto; }
-.search-hit-card {
-  background: rgba(30, 41, 68, 0.75);
-  border: 1px solid rgba(167, 139, 250, 0.35);
-  border-radius: 12px;
-  padding: 14px;
-}
+.search-hit-card { background: rgba(30, 41, 68, 0.75); border: 1px solid rgba(167, 139, 250, 0.35); border-radius: 12px; padding: 14px; }
 .search-hit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 12px; margin-top: 8px; }
 .search-hit-remark { margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(167, 139, 250, 0.3); font-size: 12px; color: #fde68a; }
 
