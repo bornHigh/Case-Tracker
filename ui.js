@@ -6,6 +6,42 @@ const LEAF_THEMES = [
   { core: '#f59e0b', tip: '#fef08a', glow: 'rgba(245, 158, 11, 0.95)' }
 ];
 
+function buildMajesticLeaf(theme) {
+  const ns = 'http://w3.org';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 36 36');
+  svg.style.width = '28px';
+  svg.style.height = '28px';
+  svg.style.display = 'block';
+  svg.style.overflow = 'visible';
+
+  const body = document.createElementNS(ns, 'path');
+  body.setAttribute('d', 'M30 4 C25 4.5 21.5 6.2 19 5.5 L18.2 7.8 C15 8 12.2 9.8 10.5 12.2 L12 13.5 C9.2 15.8 8.2 18.8 9 22.5 C12.8 23.4 16.2 22.4 19 20 L20.2 21.5 C23 19.8 24.8 17.2 25.5 14.5 L27.6 13.6 C28.8 10.5 29.6 7.2 30 4 Z');
+  body.setAttribute('fill', theme.core);
+  body.setAttribute('fill-opacity', '0.42');
+  body.setAttribute('stroke', theme.tip);
+  body.setAttribute('stroke-width', '1.35');
+  body.setAttribute('stroke-linejoin', 'round');
+
+  const veins = document.createElementNS(ns, 'path');
+  veins.setAttribute('d', 'M4.5 31.5 Q7.5 26.8 10.5 22 Q18 15.5 28.8 5.2 M13.8 19.2 Q12.5 14.8 13 11.2 M18.2 15.2 Q17 11 17.8 7.8 M22.2 11.4 Q21.4 8.2 22.6 5.8 M15 18.4 Q19 18.8 22.5 18 M19.4 14.4 Q23 14.8 25.8 13.6 M23 10.6 Q25.8 10.6 28 9.4');
+  veins.setAttribute('stroke', '#ffffff');
+  veins.setAttribute('stroke-width', '1.05');
+  veins.setAttribute('stroke-linecap', 'round');
+  veins.setAttribute('fill', 'none');
+
+  const spark = document.createElementNS(ns, 'circle');
+  spark.setAttribute('cx', '10.5');
+  spark.setAttribute('cy', '22');
+  spark.setAttribute('r', '1.7');
+  spark.setAttribute('fill', '#ffffff');
+
+  svg.appendChild(body);
+  svg.appendChild(veins);
+  svg.appendChild(spark);
+  return svg;
+}
+
 function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const rail = document.getElementById(railId);
   if (!rail) return;
@@ -15,15 +51,8 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     const theme = LEAF_THEMES[p % LEAF_THEMES.length];
     const leaf = makeEl('button', 'leaf-btn' + (p === currentPage ? ' active' : ''));
     leaf.type = 'button';
-    leaf.style.setProperty('--leaf-core', theme.core);
-    leaf.style.setProperty('--leaf-tip', theme.tip);
     leaf.style.setProperty('--leaf-glow', theme.glow);
-
-    const blade = makeEl('span', 'leaf-blade');
-    const vein = makeEl('span', 'leaf-vein');
-    blade.appendChild(vein);
-    leaf.appendChild(blade);
-
+    leaf.appendChild(buildMajesticLeaf(theme));
     leaf.onclick = () => onSelect(p);
     rail.appendChild(leaf);
   }
