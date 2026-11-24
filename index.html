@@ -256,3 +256,19 @@
       <div class="form-group">
         <label>Upload Local Photo or Looping Video (.jpg, .png, .mp4, .webm)</label>
         <input type="file" id="wallpaperFileInput" accept="image/*,video/mp4,video/webm" />
+      </div>
+      <div class="form-group">
+        <label>Or Paste Direct Image / Video URL</label>
+        <input type="url" id="wallpaperUrlInput" placeholder="https://example.com" />
+      </div>
+      <div class="header-actions" style="justify-content: flex-end; margin-top: 12px;">
+        <button type="button" class="btn-secondary" id="clearWallpaperBtn">Clear Wallpaper</button>
+        <button type="button" class="btn-primary" id="applyWallpaperUrlBtn">Apply URL</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="engine.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>
