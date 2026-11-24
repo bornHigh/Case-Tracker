@@ -247,26 +247,28 @@
     </div>
   </div>
 
-  <div id="wallpaperModal" class="modal-backdrop hidden">
-    <div class="modal-3d-card" style="max-width: 440px;">
+    <div id="wallpaperModal" class="modal-backdrop hidden">
+    <div class="modal-3d-card" style="max-width: 560px;">
       <div class="panel-header">
         <h3 class="fancy-title">✦ Realm Wallpaper Studio</h3>
         <button type="button" class="btn-icon" id="closeWallpaperModalBtn">✕</button>
       </div>
-      <div class="form-group">
-        <label>Upload Local Photo or Looping Video (.jpg, .png, .mp4, .webm)</label>
-        <input type="file" id="wallpaperFileInput" accept="image/*,video/mp4,video/webm" />
+
+      <p class="muted-text" style="margin-bottom: 10px;">
+        Showing photos &amp; looping videos from your <strong>wallpapers/</strong> folder in GitHub:
+      </p>
+
+      <div id="repoWallpaperGrid" class="wp-gallery-grid">
+        <p class="muted-text">Loading wallpapers from GitHub...</p>
       </div>
-      <div class="form-group">
-        <label>Or Paste Direct Image / Video URL</label>
-        <input type="url" id="wallpaperUrlInput" placeholder="https://example.com" />
-      </div>
-      <div class="header-actions" style="justify-content: flex-end; margin-top: 12px;">
-        <button type="button" class="btn-secondary" id="clearWallpaperBtn">Clear Wallpaper</button>
-        <button type="button" class="btn-primary" id="applyWallpaperUrlBtn">Apply URL</button>
+
+      <div class="header-actions" style="justify-content: space-between; margin-top: 14px;">
+        <button type="button" class="btn-secondary btn-xs" id="refreshWallpapersBtn">↻ Refresh List</button>
+        <button type="button" class="btn-secondary" id="clearWallpaperBtn">Reset Default Theme</button>
       </div>
     </div>
   </div>
+
 
   <script src="engine.js"></script>
   <script src="ui.js"></script>
