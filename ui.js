@@ -1,15 +1,10 @@
 const LEAF_THEMES = [
-  { core: '%23a855f7', tip: '%23fbbf24', glow: 'rgba(168, 85, 247, 0.95)' },
-  { core: '%2338bdf8', tip: '%23a855f7', glow: 'rgba(56, 189, 248, 0.95)' },
-  { core: '%2310b981', tip: '%23fde047', glow: 'rgba(16, 185, 129, 0.95)' },
-  { core: '%23ec4899', tip: '%23fbbf24', glow: 'rgba(236, 72, 153, 0.95)' },
-  { core: '%23f59e0b', tip: '%23fef08a', glow: 'rgba(245, 158, 11, 0.95)' }
+  { core: '#a855f7', tip: '#fbbf24', glow: 'rgba(168, 85, 247, 0.95)' },
+  { core: '#38bdf8', tip: '#a855f7', glow: 'rgba(56, 189, 248, 0.95)' },
+  { core: '#10b981', tip: '#fde047', glow: 'rgba(16, 185, 129, 0.95)' },
+  { core: '#ec4899', tip: '#fbbf24', glow: 'rgba(236, 72, 153, 0.95)' },
+  { core: '#f59e0b', tip: '#fef08a', glow: 'rgba(245, 158, 11, 0.95)' }
 ];
-
-function getEtherealLeafBg(theme) {
-  const svg = `<svg xmlns="http://w3.org" viewBox="0 0 32 32"><path d="M26 4C21 4.6 18 6.2 15.8 5.7L15 7.5C12.5 7.8 10.5 9.3 9.2 11.4L10.5 12.5C8.5 14.5 7.8 17 8.5 19.8C11.5 20.5 14.5 19.8 16.8 18L17.8 19.2C20 17.8 21.5 15.8 22 13.5L23.6 12.8C24.6 10.2 25.5 7.2 26 4Z" fill="${theme.core}" fill-opacity="0.55" stroke="${theme.tip}" stroke-width="1.3"/><path d="M4 28Q7 23.5 9.5 19.5Q15.5 14 25 5M12.2 17.2Q11.2 13.5 11.5 10.5M15.8 13.8Q14.8 10.2 15.5 7.5M19.2 10.5Q18.5 7.8 19.5 5.8M13.2 16.4Q16.5 16.8 19.5 16.2M16.8 13.1Q19.8 13.4 22.2 12.5M19.8 9.8Q22.2 9.8 24 8.8" stroke="%23ffffff" stroke-width="1.1" stroke-linecap="round" fill="none"/><circle cx="9.5" cy="19.5" r="1.8" fill="%23ffffff"/></svg>`;
-  return `url("data:image/svg+xml,${svg}")`;
-}
 
 function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const rail = document.getElementById(railId);
@@ -20,14 +15,19 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     const theme = LEAF_THEMES[p % LEAF_THEMES.length];
     const leaf = makeEl('button', 'leaf-btn' + (p === currentPage ? ' active' : ''));
     leaf.type = 'button';
-    leaf.style.backgroundImage = getEtherealLeafBg(theme);
+    leaf.style.setProperty('--leaf-core', theme.core);
+    leaf.style.setProperty('--leaf-tip', theme.tip);
     leaf.style.setProperty('--leaf-glow', theme.glow);
+
+    const blade = makeEl('span', 'leaf-blade');
+    const vein = makeEl('span', 'leaf-vein');
+    blade.appendChild(vein);
+    leaf.appendChild(blade);
+
     leaf.onclick = () => onSelect(p);
     rail.appendChild(leaf);
   }
 }
-
-
 
 function makeMonthButton(t, activeId) {
   const btn = makeEl('button', 'month-btn' + (t.id === activeId ? ' active' : ''));
