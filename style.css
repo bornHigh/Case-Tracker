@@ -207,7 +207,10 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   width: 26px;
   height: 26px;
   padding: 0;
-  background: transparent;
+  background-color: transparent;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
   border: none;
   box-shadow: none;
   border-radius: 0;
