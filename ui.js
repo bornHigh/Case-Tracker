@@ -329,6 +329,60 @@ function bindDragAndDrop() {
   });
 }
 
+async function loadRepoWallpapers() {
+  const grid = document.getElementById('repoWallpaperGrid');
+  if (!grid) return;
+  clearEl(grid);
+  grid.appendChild(makeEl('p', 'muted-text', 'Fetching from GitHub wallpapers/ folder...'));
+
+  try {
+    const res = await fetch('https://github.com');
+    if (!res.ok) throw new Error('Folder not found');
+    const files = await res.json();
+    const media = files.filter(f => /\.(jpg|jpeg|png|webp|gif|mp4|webm)$/i.test(f.name));
+
+    clearEl(grid);
+    if (!media.length) {
+      grid.appendChild(makeEl('p', 'muted-text', 'No images or videos found in wallpapers/ yet.'));
+      return;
+    }
+
+    media.forEach(file => {
+      const isVideo = /\.(mp4|webm)$/i.test(file.name);
+      const liveUrl = `https://github.io{encodeURIComponent(file.name)}`;
+
+      const card = makeEl('button', 'wp-card');
+      card.type = 'button';
+
+      if (isVideo) {
+        const vid = makeEl('video', 'wp-thumb');
+        vid.src = liveUrl;
+        vid.muted = true;
+        vid.loop = true;
+        vid.autoplay = true;
+        vid.playsInline = true;
+        card.appendChild(vid);
+      } else {
+        const img = makeEl('img', 'wp-thumb');
+        img.src = liveUrl;
+        img.alt = file.name;
+        card.appendChild(img);
+      }
+
+      card.appendChild(makeEl('div', 'wp-label', (isVideo ? '🎬 ' : '🖼️ ') + file.name));
+      card.onclick = () => {
+        applyWallpaper(liveUrl, isVideo);
+        try { localStorage.setItem(WALLPAPER_KEY, JSON.stringify({ src: liveUrl, isVideo })); } catch (err) {}
+        document.getElementById('wallpaperModal').classList.add('hidden');
+      };
+      grid.appendChild(card);
+    });
+  } catch (err) {
+    clearEl(grid);
+    grid.appendChild(makeEl('p', 'muted-text', 'Create a "wallpapers" folder in your GitHub repo and upload photos/videos there first.'));
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   try {
     const savedWp = JSON.parse(localStorage.getItem(WALLPAPER_KEY) || 'null');
