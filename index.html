@@ -11,7 +11,6 @@
 </head>
 <body>
 
-  <!-- Live Wallpaper Background Layer (Photo or Looping Video) -->
   <div id="wallpaperLayer" class="wallpaper-layer">
     <video id="bgVideo" autoplay loop muted playsinline class="hidden"></video>
     <img id="bgImage" alt="" class="hidden" />
@@ -85,7 +84,6 @@
 
       <section id="panelsContainer" class="panels-grid">
 
-        <!-- Left Column: Forms -->
         <div id="panel-forms" draggable="true" class="stack-col workspace-panel">
           <div class="panel">
             <div class="panel-header">
@@ -175,7 +173,6 @@
           </div>
         </div>
 
-        <!-- Right Column: Case Tracker (10 rows) + QA Monit (5 rows) -->
         <div id="panel-tables" draggable="true" class="stack-col workspace-panel">
 
           <div class="panel">
@@ -188,8 +185,7 @@
             </div>
 
             <div class="paged-layout">
-              <!-- Vertical Left-Hand Inclined Leaf Pagination -->
-              <div id="caseLeafRail" class="leaf-rail" aria-label="Case Tracker Pages"></div>
+              <div id="caseLeafRail" class="leaf-rail"></div>
 
               <div class="table-wrap">
                 <table>
@@ -217,8 +213,7 @@
             </div>
 
             <div class="paged-layout">
-              <!-- Vertical Left-Hand Inclined Leaf Pagination -->
-              <div id="qaLeafRail" class="leaf-rail" aria-label="QA Monit Pages"></div>
+              <div id="qaLeafRail" class="leaf-rail"></div>
 
               <div class="table-wrap">
                 <table>
@@ -242,7 +237,6 @@
     </main>
   </div>
 
-  <!-- 3D Pop-Out Search Modal -->
   <div id="searchModal" class="modal-backdrop hidden">
     <div class="modal-3d-card">
       <div class="panel-header">
@@ -253,5 +247,12 @@
     </div>
   </div>
 
-  <!-- Wallpaper Studio Modal -->
   <div id="wallpaperModal" class="modal-backdrop hidden">
+    <div class="modal-3d-card" style="max-width: 440px;">
+      <div class="panel-header">
+        <h3 class="fancy-title">✦ Realm Wallpaper Studio</h3>
+        <button type="button" class="btn-icon" id="closeWallpaperModalBtn">✕</button>
+      </div>
+      <div class="form-group">
+        <label>Upload Local Photo or Looping Video (.jpg, .png, .mp4, .webm)</label>
+        <input type="file" id="wallpaperFileInput" accept="image/*,video/mp4,video/webm" />
