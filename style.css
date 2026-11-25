@@ -204,11 +204,11 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   width: 44px;
 }
 
-/* Pagination Leaf Button Container (Exact 36x38px Size, Zero Box Border) */
+/* Pagination Leaf Button Container (Zero Box, Full Overflow for Rising Smoke) */
 .leaf-btn {
   position: relative;
-  width: 36px;
-  height: 38px;
+  width: 44px;
+  height: 46px;
   padding: 0;
   background: transparent !important;
   border: none !important;
@@ -216,76 +216,33 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: visible;
+  transition: transform 0.25s ease;
 }
 
-/* HD Leaf Artwork with Soft Radial Mask to Erase Square Edges Completely */
-.leaf-blade {
-  position: relative;
-  width: 34px;
-  height: 36px;
-  display: block;
-  background-image: url("./wallpapers/Leaf.PNG");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+/* Video Leaf: Pitch-Black Background Stripped via Screen Blend (Zero Cropping) */
+.leaf-video {
+  width: 44px;
+  height: 46px;
+  object-fit: contain;
+  pointer-events: none;
   mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 68% 72% at 52% 48%, #000 48%, transparent 76%);
-  mask-image: radial-gradient(ellipse 68% 72% at 52% 48%, #000 48%, transparent 76%);
-  filter: brightness(0.95) contrast(1.45) saturate(1.15);
-  z-index: 2;
+  filter: contrast(1.18) saturate(1.15);
 }
 
-.leaf-vein { display: none; }
-
-/* Regal Jewel Hue Shifts for Pages 2-5 (Page 1 Keeps Exact Violet & Gold) */
-.leaf-btn:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(0.95) contrast(1.45) saturate(1.2); }
-.leaf-btn:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(0.95) contrast(1.45) saturate(1.2); }
-.leaf-btn:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(0.95) contrast(1.45) saturate(1.2); }
-.leaf-btn:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(0.95) contrast(1.45) saturate(1.2); }
+/* Distinct Jewel Hue Shifts for Pages 2-5 (Page 1 Keeps Exact Violet & Gold) */
+.leaf-btn:nth-child(5n+2) .leaf-video { filter: hue-rotate(55deg) contrast(1.18) saturate(1.2); }
+.leaf-btn:nth-child(5n+3) .leaf-video { filter: hue-rotate(140deg) contrast(1.18) saturate(1.2); }
+.leaf-btn:nth-child(5n+4) .leaf-video { filter: hue-rotate(215deg) contrast(1.18) saturate(1.2); }
+.leaf-btn:nth-child(5n+5) .leaf-video { filter: hue-rotate(290deg) contrast(1.18) saturate(1.2); }
 
 .leaf-btn:hover:not(.active) {
   transform: scale(1.1);
 }
 
-/* Active Page: Flowing Turbulent Smoke Wisps (No Blinking Blobs) */
 .leaf-btn.active {
-  transform: scale(1.18);
+  transform: scale(1.15);
 }
-
-.leaf-btn.active .leaf-blade {
-  filter: brightness(1.08) contrast(1.5) saturate(1.25);
-}
-.leaf-btn.active:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(1.08) contrast(1.5) saturate(1.25); }
-.leaf-btn.active:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(1.08) contrast(1.5) saturate(1.25); }
-.leaf-btn.active:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(1.08) contrast(1.5) saturate(1.25); }
-.leaf-btn.active:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(1.08) contrast(1.5) saturate(1.25); }
-
-/* Duplicate Leaf Layer Warped by SVG Smoke Turbulence so Fumes Flow Continuously */
-.leaf-btn.active::before {
-  content: "";
-  position: absolute;
-  inset: -4px;
-  background-image: url("./wallpapers/Leaf.PNG");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 42%, #000 35%, transparent 78%);
-  mask-image: radial-gradient(ellipse 75% 80% at 50% 42%, #000 35%, transparent 78%);
-  filter: url(#arcaneSmokeFlow) blur(1.8px) brightness(1.35) saturate(1.4);
-  opacity: 0.78;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.leaf-btn.active:nth-child(5n+2)::before { filter: url(#arcaneSmokeFlow) hue-rotate(55deg) blur(1.8px) brightness(1.35) saturate(1.4); }
-.leaf-btn.active:nth-child(5n+3)::before { filter: url(#arcaneSmokeFlow) hue-rotate(140deg) blur(1.8px) brightness(1.35) saturate(1.4); }
-.leaf-btn.active:nth-child(5n+4)::before { filter: url(#arcaneSmokeFlow) hue-rotate(215deg) blur(1.8px) brightness(1.35) saturate(1.4); }
-.leaf-btn.active:nth-child(5n+5)::before { filter: url(#arcaneSmokeFlow) hue-rotate(290deg) blur(1.8px) brightness(1.35) saturate(1.4); }
-
-.leaf-btn.active::after { display: none; }
-
 
 .form-group { margin-bottom: 12px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
