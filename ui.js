@@ -17,22 +17,40 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     const leaf = makeEl('button', 'leaf-btn' + (isActive ? ' active' : ''));
     leaf.type = 'button';
 
-    const vid = makeEl('video', 'leaf-video');
-    vid.src = isActive ? './wallpapers/Leaf-active.mp4' : './wallpapers/Leaf-active.mp4#t=0.1';
+    const canvas = makeEl('canvas', 'leaf-video');
+    canvas.width = 160;
+    canvas.height = 160;
+    const ctx = canvas.getContext('2d');
+
+    const vid = document.createElement('video');
+    vid.src = './wallpapers/Leaf-active.mp4';
     vid.muted = true;
     vid.playsInline = true;
-    vid.preload = 'auto';
+    vid.loop = true;
+
+    const drawFrame = () => {
+      if (vid.readyState >= 2) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+      }
+      if (isActive && document.body.contains(canvas)) {
+        requestAnimationFrame(drawFrame);
+      }
+    };
 
     if (isActive) {
-      vid.autoplay = true;
-      vid.loop = true;
+      vid.play().then(drawFrame).catch(() => {});
+    } else {
+      vid.currentTime = 0.1;
+      vid.addEventListener('seeked', drawFrame, { once: true });
     }
 
-    leaf.appendChild(vid);
+    leaf.appendChild(canvas);
     leaf.onclick = () => onSelect(p);
     rail.appendChild(leaf);
   }
 }
+
 
 
 function makeMonthButton(t, activeId) {
