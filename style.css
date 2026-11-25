@@ -192,23 +192,24 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
 
 .paged-layout { display: flex; align-items: flex-start; gap: 12px; }
 
+/* Right-Hand Pagination Rail Aligned with First Data Row (Below Table Header) */
 .leaf-rail {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: 8px;
-  padding: 6px 2px 6px 8px;
+  gap: 6px;
+  padding: 34px 2px 6px 8px;
   border-left: 1px solid rgba(167, 139, 250, 0.22);
   flex-shrink: 0;
-  width: 44px;
+  width: 58px;
 }
 
-/* Pagination Leaf Button Container (Zero Box, Full Overflow for Rising Smoke) */
+/* Pagination Leaf Button Container */
 .leaf-btn {
   position: relative;
-  width: 44px;
-  height: 46px;
+  width: 50px;
+  height: 50px;
   padding: 0;
   background: transparent !important;
   border: none !important;
@@ -217,32 +218,34 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   align-items: center;
   justify-content: center;
   overflow: visible;
+  mix-blend-mode: lighten;
   transition: transform 0.25s ease;
 }
 
-/* Video Leaf: Pitch-Black Background Stripped via Screen Blend (Zero Cropping) */
+/* Sharp HD Video Leaf with Pitch-Black Background Stripped */
 .leaf-video {
-  width: 44px;
-  height: 46px;
-  object-fit: contain;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
   pointer-events: none;
   mix-blend-mode: screen;
-  filter: contrast(1.18) saturate(1.15);
+  filter: brightness(0.88) contrast(1.42) saturate(1.18);
 }
 
 /* Distinct Jewel Hue Shifts for Pages 2-5 (Page 1 Keeps Exact Violet & Gold) */
-.leaf-btn:nth-child(5n+2) .leaf-video { filter: hue-rotate(55deg) contrast(1.18) saturate(1.2); }
-.leaf-btn:nth-child(5n+3) .leaf-video { filter: hue-rotate(140deg) contrast(1.18) saturate(1.2); }
-.leaf-btn:nth-child(5n+4) .leaf-video { filter: hue-rotate(215deg) contrast(1.18) saturate(1.2); }
-.leaf-btn:nth-child(5n+5) .leaf-video { filter: hue-rotate(290deg) contrast(1.18) saturate(1.2); }
+.leaf-btn:nth-child(5n+2) .leaf-video { filter: hue-rotate(55deg) brightness(0.88) contrast(1.42) saturate(1.22); }
+.leaf-btn:nth-child(5n+3) .leaf-video { filter: hue-rotate(140deg) brightness(0.88) contrast(1.42) saturate(1.22); }
+.leaf-btn:nth-child(5n+4) .leaf-video { filter: hue-rotate(215deg) brightness(0.88) contrast(1.42) saturate(1.22); }
+.leaf-btn:nth-child(5n+5) .leaf-video { filter: hue-rotate(290deg) brightness(0.88) contrast(1.42) saturate(1.22); }
 
 .leaf-btn:hover:not(.active) {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .leaf-btn.active {
-  transform: scale(1.15);
+  transform: scale(1.14);
 }
+
 
 .form-group { margin-bottom: 12px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
