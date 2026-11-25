@@ -216,11 +216,10 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   display: flex;
   align-items: center;
   justify-content: center;
-  mix-blend-mode: screen;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), filter 0.28s ease;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* HD Leaf Artwork with Dark Rectangle Crushed for Seamless Screen Blend */
+/* HD Leaf Artwork with Soft Radial Mask to Erase Square Edges Completely */
 .leaf-blade {
   position: relative;
   width: 34px;
@@ -230,78 +229,63 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  filter: brightness(0.92) contrast(1.48) saturate(1.15);
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 68% 72% at 52% 48%, #000 48%, transparent 76%);
+  mask-image: radial-gradient(ellipse 68% 72% at 52% 48%, #000 48%, transparent 76%);
+  filter: brightness(0.95) contrast(1.45) saturate(1.15);
   z-index: 2;
 }
 
 .leaf-vein { display: none; }
 
 /* Regal Jewel Hue Shifts for Pages 2-5 (Page 1 Keeps Exact Violet & Gold) */
-.leaf-btn:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(0.92) contrast(1.48) saturate(1.2); }
-.leaf-btn:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(0.92) contrast(1.48) saturate(1.2); }
-.leaf-btn:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(0.92) contrast(1.48) saturate(1.2); }
-.leaf-btn:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(0.92) contrast(1.48) saturate(1.2); }
+.leaf-btn:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(0.95) contrast(1.45) saturate(1.2); }
+.leaf-btn:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(0.95) contrast(1.45) saturate(1.2); }
+.leaf-btn:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(0.95) contrast(1.45) saturate(1.2); }
+.leaf-btn:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(0.95) contrast(1.45) saturate(1.2); }
 
-/* Subtle Hover Lift for Inactive Leaves */
 .leaf-btn:hover:not(.active) {
-  transform: scale(1.12);
+  transform: scale(1.1);
 }
 
-/* Active Page: Regal Scale, Gold Rim Radiance & Jewel Glow */
+/* Active Page: Flowing Turbulent Smoke Wisps (No Blinking Blobs) */
 .leaf-btn.active {
-  transform: scale(1.24);
+  transform: scale(1.18);
 }
 
 .leaf-btn.active .leaf-blade {
-  filter: brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 6px rgba(251, 191, 36, 0.75)) drop-shadow(0 0 12px rgba(168, 85, 247, 0.85));
+  filter: brightness(1.08) contrast(1.5) saturate(1.25);
 }
-.leaf-btn.active:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(236, 72, 153, 0.85)); }
-.leaf-btn.active:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(56, 189, 248, 0.85)); }
-.leaf-btn.active:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(16, 185, 129, 0.85)); }
-.leaf-btn.active:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(245, 158, 11, 0.85)); }
+.leaf-btn.active:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(1.08) contrast(1.5) saturate(1.25); }
+.leaf-btn.active:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(1.08) contrast(1.5) saturate(1.25); }
+.leaf-btn.active:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(1.08) contrast(1.5) saturate(1.25); }
+.leaf-btn.active:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(1.08) contrast(1.5) saturate(1.25); }
 
-.leaf-btn.active::before,
-.leaf-btn.active::after {
+/* Duplicate Leaf Layer Warped by SVG Smoke Turbulence so Fumes Flow Continuously */
+.leaf-btn.active::before {
   content: "";
   position: absolute;
-  inset: -6px;
+  inset: -4px;
+  background-image: url("./wallpapers/Leaf.PNG");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  mix-blend-mode: screen;
+  -webkit-mask-image: radial-gradient(ellipse 75% 80% at 50% 42%, #000 35%, transparent 78%);
+  mask-image: radial-gradient(ellipse 75% 80% at 50% 42%, #000 35%, transparent 78%);
+  filter: url(#arcaneSmokeFlow) blur(1.8px) brightness(1.35) saturate(1.4);
+  opacity: 0.78;
   pointer-events: none;
   z-index: 1;
-  mix-blend-mode: screen;
 }
 
-/* Drifting Ethereal Fumes Rising Around Leaf Tips */
-.leaf-btn.active::before {
-  border-radius: 60% 40% 50% 50%;
-  background:
-    radial-gradient(ellipse at 30% 25%, rgba(139, 92, 246, 0.65), transparent 55%),
-    radial-gradient(ellipse at 75% 20%, rgba(56, 189, 248, 0.55), transparent 50%),
-    radial-gradient(ellipse at 25% 85%, rgba(168, 85, 247, 0.5), transparent 55%);
-  filter: blur(4px);
-  animation: arcaneFumeRise 3.8s infinite ease-in-out;
-}
+.leaf-btn.active:nth-child(5n+2)::before { filter: url(#arcaneSmokeFlow) hue-rotate(55deg) blur(1.8px) brightness(1.35) saturate(1.4); }
+.leaf-btn.active:nth-child(5n+3)::before { filter: url(#arcaneSmokeFlow) hue-rotate(140deg) blur(1.8px) brightness(1.35) saturate(1.4); }
+.leaf-btn.active:nth-child(5n+4)::before { filter: url(#arcaneSmokeFlow) hue-rotate(215deg) blur(1.8px) brightness(1.35) saturate(1.4); }
+.leaf-btn.active:nth-child(5n+5)::before { filter: url(#arcaneSmokeFlow) hue-rotate(290deg) blur(1.8px) brightness(1.35) saturate(1.4); }
 
-/* Floating Golden & Violet Ember Sparks */
-.leaf-btn.active::after {
-  background:
-    radial-gradient(circle at 22% 35%, #fbbf24 0%, transparent 6%),
-    radial-gradient(circle at 18% 55%, #f59e0b 0%, transparent 5%),
-    radial-gradient(circle at 78% 18%, #e0e7ff 0%, transparent 6%),
-    radial-gradient(circle at 28% 82%, #c084fc 0%, transparent 5%);
-  animation: arcaneSparksFloat 3.2s infinite ease-in-out alternate;
-}
+.leaf-btn.active::after { display: none; }
 
-@keyframes arcaneFumeRise {
-  0%   { transform: translate(0px, 2px) scale(0.95) rotate(-4deg); opacity: 0.55; }
-  50%  { transform: translate(-2px, -6px) scale(1.22) rotate(8deg); opacity: 0.95; }
-  100% { transform: translate(2px, -3px) scale(1.02) rotate(-6deg); opacity: 0.6; }
-}
-
-@keyframes arcaneSparksFloat {
-  0%   { transform: translate(0px, 1px) scale(0.9); opacity: 0.5; }
-  50%  { transform: translate(-2px, -5px) scale(1.15); opacity: 1; }
-  100% { transform: translate(1px, -8px) scale(1.0); opacity: 0.4; }
-}
 
 .form-group { margin-bottom: 12px; }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
