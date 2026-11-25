@@ -204,21 +204,23 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   width: 44px;
 }
 
+/* Pagination Leaf Button Container (Exact 36x38px Size, Zero Box Border) */
 .leaf-btn {
   position: relative;
   width: 36px;
   height: 38px;
   padding: 0;
-  background: transparent;
-  border: none;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.85;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+  mix-blend-mode: screen;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), filter 0.28s ease;
 }
 
-/* Exact HD Leaf Image with Black Background Stripped via Screen Blend */
+/* HD Leaf Artwork with Dark Rectangle Crushed for Seamless Screen Blend */
 .leaf-blade {
   position: relative;
   width: 34px;
@@ -228,37 +230,35 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  mix-blend-mode: screen;
-  filter: contrast(1.18) brightness(1.08);
+  filter: brightness(0.92) contrast(1.48) saturate(1.15);
   z-index: 2;
 }
 
 .leaf-vein { display: none; }
 
-/* Distinct Jewel Hue Shifts for Pages 2, 3, 4, 5 while Page 1 stays Exact Violet & Gold */
-.leaf-btn:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) contrast(1.18) brightness(1.1); }
-.leaf-btn:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) contrast(1.18) brightness(1.1); }
-.leaf-btn:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) contrast(1.18) brightness(1.1); }
-.leaf-btn:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) contrast(1.18) brightness(1.1); }
+/* Regal Jewel Hue Shifts for Pages 2-5 (Page 1 Keeps Exact Violet & Gold) */
+.leaf-btn:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(0.92) contrast(1.48) saturate(1.2); }
+.leaf-btn:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(0.92) contrast(1.48) saturate(1.2); }
+.leaf-btn:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(0.92) contrast(1.48) saturate(1.2); }
+.leaf-btn:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(0.92) contrast(1.48) saturate(1.2); }
 
+/* Subtle Hover Lift for Inactive Leaves */
 .leaf-btn:hover:not(.active) {
-  opacity: 1;
   transform: scale(1.12);
 }
 
-/* Active Page: Drifting Blue-Violet Smoke Wisps & Floating Golden Sparks */
+/* Active Page: Regal Scale, Gold Rim Radiance & Jewel Glow */
 .leaf-btn.active {
-  opacity: 1;
   transform: scale(1.24);
 }
 
 .leaf-btn.active .leaf-blade {
-  filter: contrast(1.28) brightness(1.25) drop-shadow(0 0 8px rgba(168, 85, 247, 0.85));
+  filter: brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 6px rgba(251, 191, 36, 0.75)) drop-shadow(0 0 12px rgba(168, 85, 247, 0.85));
 }
-.leaf-btn.active:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) contrast(1.28) brightness(1.25) drop-shadow(0 0 8px rgba(236, 72, 153, 0.85)); }
-.leaf-btn.active:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) contrast(1.28) brightness(1.25) drop-shadow(0 0 8px rgba(56, 189, 248, 0.85)); }
-.leaf-btn.active:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) contrast(1.28) brightness(1.25) drop-shadow(0 0 8px rgba(16, 185, 129, 0.85)); }
-.leaf-btn.active:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) contrast(1.28) brightness(1.25) drop-shadow(0 0 8px rgba(245, 158, 11, 0.85)); }
+.leaf-btn.active:nth-child(5n+2) .leaf-blade { filter: hue-rotate(55deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(236, 72, 153, 0.85)); }
+.leaf-btn.active:nth-child(5n+3) .leaf-blade { filter: hue-rotate(140deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(56, 189, 248, 0.85)); }
+.leaf-btn.active:nth-child(5n+4) .leaf-blade { filter: hue-rotate(215deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(16, 185, 129, 0.85)); }
+.leaf-btn.active:nth-child(5n+5) .leaf-blade { filter: hue-rotate(290deg) brightness(1.05) contrast(1.55) saturate(1.3) drop-shadow(0 0 8px rgba(245, 158, 11, 0.85)); }
 
 .leaf-btn.active::before,
 .leaf-btn.active::after {
