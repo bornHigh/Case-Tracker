@@ -11,23 +11,29 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   if (!rail) return;
   clearEl(rail);
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
   for (let p = 0; p < totalPages; p++) {
-    const theme = LEAF_THEMES[p % LEAF_THEMES.length];
-    const leaf = makeEl('button', 'leaf-btn' + (p === currentPage ? ' active' : ''));
+    const isActive = p === currentPage;
+    const leaf = makeEl('button', 'leaf-btn' + (isActive ? ' active' : ''));
     leaf.type = 'button';
-    leaf.style.setProperty('--leaf-core', theme.core);
-    leaf.style.setProperty('--leaf-tip', theme.tip);
-    leaf.style.setProperty('--leaf-glow', theme.glow);
 
-    const blade = makeEl('span', 'leaf-blade');
-    const vein = makeEl('span', 'leaf-vein');
-    blade.appendChild(vein);
-    leaf.appendChild(blade);
+    const vid = makeEl('video', 'leaf-video');
+    vid.src = isActive ? './wallpapers/Leaf-active.mp4' : './wallpapers/Leaf-active.mp4#t=0.1';
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.preload = 'auto';
 
+    if (isActive) {
+      vid.autoplay = true;
+      vid.loop = true;
+    }
+
+    leaf.appendChild(vid);
     leaf.onclick = () => onSelect(p);
     rail.appendChild(leaf);
   }
 }
+
 
 function makeMonthButton(t, activeId) {
   const btn = makeEl('button', 'month-btn' + (t.id === activeId ? ' active' : ''));
