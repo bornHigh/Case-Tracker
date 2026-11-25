@@ -18,9 +18,9 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     leaf.type = 'button';
 
     const canvas = makeEl('canvas', 'leaf-video');
-    canvas.width = 160;
-    canvas.height = 160;
-    const ctx = canvas.getContext('2d');
+    canvas.width = 120;
+    canvas.height = 120;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
     const vid = document.createElement('video');
     vid.src = './wallpapers/Leaf-active.mp4';
@@ -30,8 +30,14 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
 
     const drawFrame = () => {
       if (vid.readyState >= 2) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(vid, 0, 0, 120, 120);
+        const frame = ctx.getImageData(0, 0, 120, 120);
+        const d = frame.data;
+        for (let i = 0; i < d.length; i += 4) {
+          const peak = Math.max(d[i], d[i + 1], d[i + 2]);
+          d[i + 3] = peak < 18 ? 0 : Math.min(255, peak * 1.45);
+        }
+        ctx.putImageData(frame, 0, 0);
       }
       if (isActive && document.body.contains(canvas)) {
         requestAnimationFrame(drawFrame);
@@ -50,7 +56,6 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     rail.appendChild(leaf);
   }
 }
-
 
 
 function makeMonthButton(t, activeId) {
