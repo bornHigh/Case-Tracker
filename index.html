@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://googleapis.com" />
   <link rel="preconnect" href="https://gstatic.com" crossorigin />
   <link href="https://googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
 </head>
 <body>
 
@@ -267,9 +267,20 @@
       </div>
     </div>
   </div>
+  
+  <!-- Real Flowing Smoke Turbulence Filter -->
+  <svg width="0" height="0" style="position:absolute; pointer-events:none;">
+    <defs>
+      <filter id="arcaneSmokeFlow" x="-40%" y="-60%" width="180%" height="200%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035 0.08" numOctaves="3" seed="2" result="noise">
+          <animate attributeName="baseFrequency" dur="7s" values="0.035 0.08;0.045 0.11;0.035 0.08" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="5.5" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
 
-
-  <script src="engine.js?v=8"></script>
-  <script src="ui.js?v=8"></script>
+  <script src="engine.js?v=9"></script>
+  <script src="ui.js?v=9"></script>
 </body>
 </html>
