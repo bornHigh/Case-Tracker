@@ -224,7 +224,7 @@ main { flex: 1; padding: 22px; overflow-y: auto; display: flex; flex-direction: 
   width: 34px;
   height: 36px;
   display: block;
-  background-image: url("./leaf.png");
+  background-image: url("./wallpapers/Leaf.PNG");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
