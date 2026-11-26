@@ -16,7 +16,14 @@ function keyAlphaFrame(ctx, w, h) {
   const d = frame.data;
   for (let i = 0; i < d.length; i += 4) {
     const peak = Math.max(d[i], d[i + 1], d[i + 2]);
-    d[i + 3] = peak < 16 ? 0 : peak < 42 ? Math.round(((peak - 16) / 26) * 255) : 255;
+    if (peak <= 14) {
+      d[i + 3] = 0;
+    } else if (peak < 110) {
+      const t = (peak - 14) / 96;
+      d[i + 3] = Math.round(Math.pow(t, 1.35) * 255);
+    } else {
+      d[i + 3] = 255;
+    }
   }
   ctx.putImageData(frame, 0, 0);
 }
@@ -66,6 +73,7 @@ function getActiveLeafCanvas(railId) {
         canvas.width = vid.videoWidth;
         canvas.height = vid.videoHeight;
       }
+      ctx.filter = 'blur(0.45px) contrast(1.08)';
       ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
       keyAlphaFrame(ctx, canvas.width, canvas.height);
       if (!cachedLeafPng && vid.currentTime > 0.05) {
