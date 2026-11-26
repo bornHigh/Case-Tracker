@@ -109,11 +109,42 @@
                 </div>
               </div>
 
-              <div class="form-row form-group">
+                            <div class="form-row form-group">
                 <div>
                   <label>AHT (Minutes)</label>
                   <input type="number" step="0.1" min="0" id="ahtInput" required placeholder="e.g. 24.5" />
                 </div>
+                <div>
+                  <label>CSAT Outcome</label>
+                  <select id="csatInput">
+                    <option value="Bounty">Bounty</option>
+                    <option value="Doomed">Doomed</option>
+                    <option value="Void">Void</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row form-group">
+                <div>
+                  <label>CRT NE</label>
+                  <select id="crtInput">
+                    <option value="Bounty">Bounty</option>
+                    <option value="Doomed">Doomed</option>
+                    <option value="Void">Void</option>
+                  </select>
+                </div>
+                <div>
+                  <label>RR (30 Min)</label>
+                  <select id="rrInput">
+                    <option value="Bounty">Bounty</option>
+                    <option value="Doomed">Doomed</option>
+                    <option value="Void">Void</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" id="submitCaseBtn" class="btn-primary btn-full">
+                + Add Case to Tracker
+              </button>
+            </form>
           </div>
 
           <div class="panel">
