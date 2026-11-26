@@ -747,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
       aht: parseFloat(document.getElementById('ahtInput').value) || 0,
       csat: document.getElementById('csatInput').value,
       crt: document.getElementById('crtInput').value,
-      triage: document.getElementById('triageInput').value,
+      rr: document.getElementById('rrInput').value,
       remark: ''
     });
     casePage = 0; e.target.reset(); saveState(); render();
@@ -813,8 +813,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('exportBtn').addEventListener('click', () => {
     const tab = getActiveTab();
-    const headers = ['Case ID', 'Client', 'AHT', 'CSAT', 'CRT NE', 'Triage', 'Remarks'];
-    const rows = tab.cases.map(c => [c.id, c.client || '', c.aht, c.csat, c.crt, c.triage, `"${(c.remark || '').replace(/"/g, '""')}"`]);
+    const headers = ['Case ID', 'Client', 'AHT', 'CSAT', 'CRT NE', 'RR', 'Remarks'];
+    const rows = tab.cases.map(c => [c.id, c.client || '', c.aht, c.csat, c.crt, c.rr, `"${(c.remark || '').replace(/"/g, '""')}"`]);
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
