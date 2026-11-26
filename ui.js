@@ -6,54 +6,106 @@ const LEAF_THEMES = [
   { core: '#f59e0b', tip: '#fef08a', glow: 'rgba(245, 158, 11, 0.95)' }
 ];
 
+let cachedStaticLeafUrl = null;
+let staticLeafBuilding = false;
+const staticLeafWaiters = [];
+const activeLeafPlayers = {};
+
+function keyAlphaFrame(ctx, w, h) {
+  const frame = ctx.getImageData(0, 0, w, h);
+  const d = frame.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const peak = Math.max(d[i], d[i + 1], d[i + 2]);
+    d[i + 3] = peak < 16 ? 0 : peak < 42 ? Math.round(((peak - 16) / 26) * 255) : 255;
+  }
+  ctx.putImageData(frame, 0, 0);
+}
+
+function getStaticLeafSnapshot(cb) {
+  if (cachedStaticLeafUrl) return cb(cachedStaticLeafUrl);
+  staticLeafWaiters.push(cb);
+  if (staticLeafBuilding) return;
+  staticLeafBuilding = true;
+
+  const vid = document.createElement('video');
+  vid.src = './wallpapers/Leaf-active.mp4';
+  vid.muted = true;
+  vid.playsInline = true;
+  vid.addEventListener('loadeddata', () => { vid.currentTime = 0.12; }, { once: true });
+  vid.addEventListener('seeked', () => {
+    const w = Math.max(vid.videoWidth || 360, 360);
+    const h = Math.max(vid.videoHeight || 360, 360);
+    const off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    const ctx = off.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(vid, 0, 0, w, h);
+    keyAlphaFrame(ctx, w, h);
+    cachedStaticLeafUrl = off.toDataURL('image/png');
+    staticLeafBuilding = false;
+    while (staticLeafWaiters.length) staticLeafWaiters.shift()(cachedStaticLeafUrl);
+  }, { once: true });
+}
+
+function getActiveLeafCanvas(railId) {
+  if (activeLeafPlayers[railId]) return activeLeafPlayers[railId].canvas;
+  const canvas = makeEl('canvas', 'leaf-video');
+  canvas.width = 360; canvas.height = 360;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const vid = document.createElement('video');
+  vid.src = './wallpapers/Leaf-active.mp4';
+  vid.muted = true; vid.playsInline = true; vid.loop = true;
+
+  const player = { canvas, vid, running: false };
+  activeLeafPlayers[railId] = player;
+
+  const loop = () => {
+    if (!player.running) return;
+    if (vid.readyState >= 2) {
+      const w = Math.max(vid.videoWidth || 360, 360);
+      const h = Math.max(vid.videoHeight || 360, 360);
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+      ctx.drawImage(vid, 0, 0, w, h);
+      keyAlphaFrame(ctx, w, h);
+    }
+    requestAnimationFrame(loop);
+  };
+
+  player.start = () => {
+    if (vid.paused) vid.play().catch(() => {});
+    if (!player.running) { player.running = true; requestAnimationFrame(loop); }
+  };
+  player.start();
+  return canvas;
+}
+
 function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const rail = document.getElementById(railId);
   if (!rail) return;
-  clearEl(rail);
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  while (rail.children.length > totalPages) rail.removeChild(rail.lastChild);
 
   for (let p = 0; p < totalPages; p++) {
     const isActive = p === currentPage;
-    const leaf = makeEl('button', 'leaf-btn' + (isActive ? ' active' : ''));
-    leaf.type = 'button';
-
-    const canvas = makeEl('canvas', 'leaf-video');
-    canvas.width = 120;
-    canvas.height = 120;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-    const vid = document.createElement('video');
-    vid.src = './wallpapers/Leaf-active.mp4';
-    vid.muted = true;
-    vid.playsInline = true;
-    vid.loop = true;
-
-    const drawFrame = () => {
-      if (vid.readyState >= 2) {
-        ctx.drawImage(vid, 0, 0, 120, 120);
-        const frame = ctx.getImageData(0, 0, 120, 120);
-        const d = frame.data;
-        for (let i = 0; i < d.length; i += 4) {
-          const peak = Math.max(d[i], d[i + 1], d[i + 2]);
-          d[i + 3] = peak < 18 ? 0 : Math.min(255, peak * 1.45);
-        }
-        ctx.putImageData(frame, 0, 0);
-      }
-      if (isActive && document.body.contains(canvas)) {
-        requestAnimationFrame(drawFrame);
-      }
-    };
+    let leaf = rail.children[p];
+    if (!leaf) {
+      leaf = makeEl('button', 'leaf-btn');
+      leaf.type = 'button';
+      rail.appendChild(leaf);
+    }
+    leaf.className = 'leaf-btn' + (isActive ? ' active' : '');
+    leaf.onclick = () => { if (p !== currentPage) onSelect(p); };
 
     if (isActive) {
-      vid.play().then(drawFrame).catch(() => {});
-    } else {
-      vid.currentTime = 0.1;
-      vid.addEventListener('seeked', drawFrame, { once: true });
+      const activeCanvas = getActiveLeafCanvas(railId);
+      if (leaf.firstChild !== activeCanvas) { clearEl(leaf); leaf.appendChild(activeCanvas); }
+      activeLeafPlayers[railId].start();
+    } else if (!leaf.querySelector('img.leaf-video')) {
+      clearEl(leaf);
+      const img = makeEl('img', 'leaf-video');
+      img.alt = `Page ${p + 1}`;
+      getStaticLeafSnapshot(url => { if (img.isConnected) img.src = url; });
+      leaf.appendChild(img);
     }
-
-    leaf.appendChild(canvas);
-    leaf.onclick = () => onSelect(p);
-    rail.appendChild(leaf);
   }
 }
 
