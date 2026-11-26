@@ -516,19 +516,26 @@ function forgeLiveProphecy() {
   return `“${opener} ${body}”`;
 }
 
-/* Automatically alternate between a newly forged procedural seal OR live prophecy */
+/* Automatically unroll the floating parchment with either dark-amber runes OR a wax-sealed decree */
 function shiftArcaneRelic() {
   const host = document.getElementById('oracleDisplay');
   if (!host) return;
 
+  // Replay the vertical scroll-unroll animation on every trigger
   host.style.animation = 'none';
-  host.offsetHeight; // Replay fade-in transition
+  host.offsetHeight;
   host.style.animation = '';
 
   if (Math.random() < 0.5) {
-    host.innerHTML = `<div class="oracle-sigil-only">${forgeProceduralSeal()}</div>`;
+    // Etch the procedural alchemy seal in rich dark-amber ink to contrast with the parchment
+    const parchmentSeal = forgeProceduralSeal()
+      .replace(/#f3d266/g, '#78350f')
+      .replace(/#fde047/g, '#92400e');
+    host.innerHTML = `<div class="oracle-sigil-only">${parchmentSeal}</div>`;
   } else {
+    // Stamp a crimson royal wax seal beside the dark calligraphy prophecy
     host.innerHTML = `
+      <div class="scroll-wax-seal">⚜</div>
       <div class="oracle-quote-only">
         <span class="oracle-rune-divider">✦ ─── ✦</span>
         ${forgeLiveProphecy()}
@@ -536,7 +543,6 @@ function shiftArcaneRelic() {
       </div>`;
   }
 }
-
 
 function render() {
   const tab = getActiveTab();
