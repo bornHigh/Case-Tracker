@@ -92,6 +92,38 @@ function getActiveLeafCanvas(railId) {
   return canvas;
 }
 
+function createHdLeafSvg(pageIndex) {
+  const palettes = [
+    ['#fef08a', '#d4af37', '#854d0e'], // Champagne Gold
+    ['#6ee7b7', '#10b981', '#065f46'], // Emerald
+    ['#7dd3fc', '#0ea5e9', '#075985'], // Arcane Cyan
+    ['#f9a8d4', '#ec4899', '#831843'], // Mystic Rose
+    ['#fde047', '#f59e0b', '#92400e']  // Amber Flame
+  ];
+  const [c1, c2, c3] = palettes[pageIndex % palettes.length];
+  const gradId = `leafGrad_${pageIndex}_${Math.random().toString(36).slice(2, 6)}`;
+
+  const svg = document.createElementNS('http://w3.org', 'svg');
+  svg.setAttribute('viewBox', '0 0 64 64');
+  svg.setAttribute('class', 'hd-leaf-svg');
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="${gradId}" x1="15%" y1="10%" x2="85%" y2="90%">
+        <stop offset="0%" stop-color="${c1}" />
+        <stop offset="55%" stop-color="${c2}" />
+        <stop offset="100%" stop-color="${c3}" />
+      </linearGradient>
+    </defs>
+    <path d="M52 10 C32 10, 14 22, 12 44 C11 49, 13 52, 13 52 C13 52, 16 54, 21 53 C43 51, 54 32, 52 10 Z"
+          fill="url(#${gradId})" stroke="${c1}" stroke-width="1.4" stroke-linejoin="round" />
+    <path d="M10 54 C22 42, 36 28, 50 12" fill="none" stroke="#fffbeb" stroke-width="1.6" stroke-linecap="round" opacity="0.85" />
+    <path d="M24 40 L22 30 M32 32 L30 21 M40 24 L39 15 M28 36 L38 38 M36 28 L45 29"
+          fill="none" stroke="#fffbeb" stroke-width="1.1" stroke-linecap="round" opacity="0.6" />
+  `;
+  return svg;
+}
+
 function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const rail = document.getElementById(railId);
   if (!rail) return;
@@ -112,7 +144,11 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     leaf.onclick = () => { if (p !== currentPage) onSelect(p); };
 
     if (isActive) {
-      if (leaf.firstChild !== activeCanvas) { clearEl(leaf); leaf.appendChild(activeCanvas); }
+      if (!leaf.contains(activeCanvas)) {
+        clearEl(leaf);
+        leaf.appendChild(activeCanvas);
+        leaf.appendChild(createHdLeafSvg(p));
+      }
       activeLeafPlayers[railId].start();
     } else if (!leaf.querySelector('img.leaf-static')) {
       clearEl(leaf);
@@ -120,6 +156,7 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
       img.alt = `Page ${p + 1}`;
       if (cachedLeafPng) img.src = cachedLeafPng;
       leaf.appendChild(img);
+      leaf.appendChild(createHdLeafSvg(p));
     }
   }
 }
