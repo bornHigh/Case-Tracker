@@ -516,33 +516,96 @@ function forgeLiveProphecy() {
   return `“${opener} ${body}”`;
 }
 
-/* Automatically unroll the floating parchment with either dark-amber runes OR a wax-sealed decree */
+/* Renders the Sleek Charred-Edge Relic Scroll with 3D Rolled Cylinders & Crimson Wax Seal */
+function buildBurntScrollSvg(withWaxSeal) {
+  const uid = Math.random().toString(36).slice(2, 6);
+  const waxMarkup = withWaxSeal ? `
+    <g transform="translate(126, 44)">
+      <circle cx="0" cy="1" r="13" fill="rgba(20, 5, 5, 0.55)"/>
+      <path d="M-11,-3 C-13,-9 -5,-13 1,-12 C8,-13 13,-7 11,0 C13,7 7,13 0,12 C-7,13 -13,7 -11,-3 Z" fill="url(#waxGrad_${uid})" stroke="#450a0a" stroke-width="0.9"/>
+      <circle cx="0" cy="0" r="8" fill="none" stroke="#fca5a5" stroke-opacity="0.35" stroke-width="0.8"/>
+      <text x="0" y="3.5" text-anchor="middle" font-size="10" fill="#fecaca" font-family="serif">⚜</text>
+    </g>` : '';
+
+  return `
+    <svg class="scroll-art-bg" viewBox="0 0 180 230" preserveAspectRatio="none">
+      <defs>
+        <radialGradient id="parchmentGrad_${uid}" cx="50%" cy="50%" r="65%">
+          <stop offset="0%" stop-color="#d6b47c"/>
+          <stop offset="58%" stop-color="#a87b43"/>
+          <stop offset="86%" stop-color="#6b441e"/>
+          <stop offset="100%" stop-color="#2b1708"/>
+        </radialGradient>
+        <linearGradient id="rollGrad_${uid}" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#3b210d"/>
+          <stop offset="28%" stop-color="#c49a5b"/>
+          <stop offset="55%" stop-color="#8c5d2b"/>
+          <stop offset="85%" stop-color="#3a1f0b"/>
+          <stop offset="100%" stop-color="#1c0d04"/>
+        </linearGradient>
+        <radialGradient id="waxGrad_${uid}" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ef4444"/>
+          <stop offset="55%" stop-color="#991b1b"/>
+          <stop offset="100%" stop-color="#450a0a"/>
+        </radialGradient>
+        <filter id="burnEdge_${uid}" x="-8%" y="-5%" width="116%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.065" numOctaves="4" seed="7" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="5.5" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+
+      <!-- Jagged Burnt-Edge Parchment Sheet -->
+      <path d="M22,22 L158,22 L156,56 L160,88 L155,124 L159,162 L156,208 L24,208 L21,168 L25,130 L20,92 L24,54 Z"
+            fill="url(#parchmentGrad_${uid})" stroke="#1f0f04" stroke-width="2.2" filter="url(#burnEdge_${uid})"/>
+
+      <!-- Inner Charred Vignette Shadow -->
+      <rect x="24" y="24" width="132" height="182" fill="none" stroke="#291406" stroke-width="5" stroke-opacity="0.45" filter="url(#burnEdge_${uid})"/>
+
+      <!-- Top Rolled Parchment Cylinder & Spiral Ends -->
+      <rect x="10" y="10" width="160" height="18" rx="7" fill="url(#rollGrad_${uid})" stroke="#1f0f04" stroke-width="1.3"/>
+      <ellipse cx="12" cy="19" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
+      <ellipse cx="168" cy="19" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
+
+      <!-- Bottom Rolled Parchment Cylinder & Spiral Ends -->
+      <rect x="10" y="202" width="160" height="18" rx="7" fill="url(#rollGrad_${uid})" stroke="#1f0f04" stroke-width="1.3"/>
+      <ellipse cx="12" cy="211" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
+      <ellipse cx="168" cy="211" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
+
+      ${waxMarkup}
+    </svg>`;
+}
+
+/* Automatically unroll the sleek charred scroll with either glowing ember runes OR a wax-sealed decree */
 function shiftArcaneRelic() {
   const host = document.getElementById('oracleDisplay');
   if (!host) return;
 
-  // Replay the vertical scroll-unroll animation on every trigger
   host.style.animation = 'none';
   host.offsetHeight;
   host.style.animation = '';
 
   if (Math.random() < 0.5) {
-    // Etch the procedural alchemy seal in rich dark-amber ink to contrast with the parchment
-    const parchmentSeal = forgeProceduralSeal()
-      .replace(/#f3d266/g, '#78350f')
-      .replace(/#fde047/g, '#92400e');
-    host.innerHTML = `<div class="oracle-sigil-only">${parchmentSeal}</div>`;
-  } else {
-    // Stamp a crimson royal wax seal beside the dark calligraphy prophecy
+    const emberSeal = forgeProceduralSeal()
+      .replace(/#f3d266/g, '#451a03')
+      .replace(/#fde047/g, '#78350f');
     host.innerHTML = `
-      <div class="scroll-wax-seal">⚜</div>
-      <div class="oracle-quote-only">
-        <span class="oracle-rune-divider">✦ ─── ✦</span>
-        ${forgeLiveProphecy()}
-        <span class="oracle-rune-divider">✦ ─── ✦</span>
+      ${buildBurntScrollSvg(false)}
+      <div class="scroll-content-layer">
+        <div class="oracle-sigil-only">${emberSeal}</div>
+      </div>`;
+  } else {
+    host.innerHTML = `
+      ${buildBurntScrollSvg(true)}
+      <div class="scroll-content-layer">
+        <div class="oracle-quote-only" style="padding-top:14px;">
+          <span class="oracle-rune-divider">✦ ─── ✦</span>
+          ${forgeLiveProphecy()}
+          <span class="oracle-rune-divider">✦ ─── ✦</span>
+        </div>
       </div>`;
   }
 }
+
 
 function render() {
   const tab = getActiveTab();
