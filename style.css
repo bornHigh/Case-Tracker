@@ -151,16 +151,16 @@ aside {
   50% { transform: translateY(-5px) rotate(0.6deg); }
 }
 
-/* Tall, dramatic dark-fantasy scroll matching your red sidebar marks */
+/* Real Scrubbed Parchment Scroll Asset (236px x 344px) */
 .oracle-display {
   position: relative;
-  width: 218px;
-  min-height: 335px;
+  width: 236px;
+  height: 344px;
   display: flex;
   align-items: center;
   justify-content: center;
   transform-origin: top center;
-  filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.92)) drop-shadow(0 0 18px rgba(245, 158, 11, 0.18));
+  filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.85));
   animation: scrollUnroll 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
@@ -169,61 +169,63 @@ aside {
   100% { opacity: 1; transform: scaleY(1) translateY(0); }
 }
 
-/* Photorealistic Textured Burnt-Edge SVG Scroll Backdrop */
+/* Transparency-Cleaned ./wallpapers/scroll.png Backdrop */
 .scroll-art-bg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: contain;
   pointer-events: none;
   z-index: 1;
-  overflow: visible;
 }
 
-/* Content Layer Floating Over the Charred Parchment */
+/* Safe Inner Parchment Text Box (Fits Cleanly Between Top Compass & Bottom Pentacle) */
 .scroll-content-layer {
   position: relative;
   z-index: 2;
   width: 100%;
-  padding: 46px 26px;
+  height: 100%;
+  padding: 78px 42px 76px 42px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
-/* Glowing Golden-Ember Alchemy Circle inside Charred Parchment */
+/* Dark-Crimson Etched Alchemy Circle inside Parchment */
 .oracle-sigil-only {
-  width: 144px;
-  height: 144px;
+  width: 122px;
+  height: 122px;
   margin: 0 auto;
-  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.85)) drop-shadow(0 0 22px rgba(217, 119, 6, 0.65));
+  filter: drop-shadow(0 1px 2px rgba(60, 10, 10, 0.35));
 }
-
 .oracle-sigil-only svg { width: 100%; height: 100%; overflow: visible; }
 .oracle-spin-cw { transform-origin: 60px 60px; animation: spinCW 34s linear infinite; }
 .oracle-spin-ccw { transform-origin: 60px 60px; animation: spinCCW 26s linear infinite; }
 @keyframes spinCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes spinCCW { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
-/* Antique Sepia Ink Calligraphy on Charred Parchment */
+/* Authentic Dark-Crimson Calligraphy Ink Matching Original Reference Scroll */
 .oracle-quote-only {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
   line-height: 1.46;
-  color: #1e1005;
+  color: #5c0a0a;
   font-style: italic;
-  text-align: left;
-  text-shadow: 0 1px 0 rgba(255, 235, 200, 0.35);
+  text-align: center;
+  word-wrap: break-word;
+  text-shadow: 0 0 1px rgba(127, 29, 29, 0.35), 0 1px 0 rgba(255, 240, 210, 0.45);
 }
 .oracle-rune-divider {
   display: block;
   font-style: normal;
-  font-size: 8.5px;
+  font-size: 9px;
   letter-spacing: 0.2em;
-  color: #5c2d0c;
-  margin: 4px 0;
+  color: #7f1d1d;
+  margin: 5px 0;
   text-align: center;
 }
 
