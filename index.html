@@ -50,13 +50,14 @@
         <div id="oracleDisplay" class="oracle-display"></div>
       </div>
 
+            <!-- Updated €300 Bonus Rules with RR <84% (-€25) & Void exclusion -->
       <div class="rules-box">
-        <h4 class="fancy-title">❧ €300 Bonus Rules ❧</h4>
+        <h4 class="fancy-title">❧ €300 Arcane Addendum ❧</h4>
         <div>CSAT ≥94%: <span class="txt-green">+€180</span> | ≥89%: <span class="txt-green">+€100</span></div>
         <div>CSAT &lt;75%: <span class="txt-red">Forfeits All (€0)</span></div>
-        <div>CRT NE ≥94%: <span class="txt-green">+€80</span></div>
-        <div>Quality ≥90%: <span class="txt-green">+€40</span></div>
-        <div>AHT &gt;32m: <span class="txt-amber">-€50 Penalty</span></div>
+        <div>CRT NE ≥94%: <span class="txt-green">+€80</span> | SQS ≥90%: <span class="txt-green">+€40</span></div>
+        <div>RR &lt;84%: <span class="txt-amber">-€25</span> | AHT &gt;32m: <span class="txt-amber">-€50</span></div>
+        <div class="muted-text" style="font-size:10.5px;">Void entries excluded from all math</div>
       </div>
     </aside>
 
@@ -113,39 +114,6 @@
                   <label>AHT (Minutes)</label>
                   <input type="number" step="0.1" min="0" id="ahtInput" required placeholder="e.g. 24.5" />
                 </div>
-                <div>
-                  <label>CSAT Outcome</label>
-                  <select id="csatInput">
-                    <option value="Positive">Positive</option>
-                    <option value="Negative">Negative</option>
-                    <option value="Pending">Pending / No Survey</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-row form-group">
-                <div>
-                  <label>CRT NE</label>
-                  <select id="crtInput">
-                    <option value="Saved">Saved</option>
-                    <option value="Lost">Lost</option>
-                    <option value="N/A">N/A</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Triage</label>
-                  <select id="triageInput">
-                    <option value="Saved">Saved</option>
-                    <option value="Lost">Lost</option>
-                    <option value="N/A">N/A</option>
-                  </select>
-                </div>
-              </div>
-
-              <button type="submit" id="submitCaseBtn" class="btn-primary btn-full">
-                + Add Case to Tracker
-              </button>
-            </form>
           </div>
 
           <div class="panel">
@@ -199,7 +167,7 @@
                       <th>AHT</th>
                       <th>CSAT</th>
                       <th>CRT NE</th>
-                      <th>Triage</th>
+                      <th>RR</th>
                       <th class="text-right">Actions</th>
                     </tr>
                   </thead>
@@ -285,7 +253,7 @@
     </defs>
   </svg>
 
-  <script src="engine.js?v=14"></script>
-  <script src="ui.js?v=23"></script>
+  <script src="engine.js?v=15"></script>
+  <script src="ui.js?v=24"></script>
 </body>
 </html>
