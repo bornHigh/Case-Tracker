@@ -229,7 +229,17 @@ function renderSidebarAndCards(tab, m) {
   document.getElementById('archiveBtn').disabled = tab.archived;
 
   const cardsData = {
-    bonus: { title: 'Real-Time Bonus Payout', value: `€${m.totalBonus}`, sub: m.forfeited ? 'Forfeited (CSAT <75%)' : m.penalty > 0 ? '-€50 AHT penalty' : 'Max Pool: €300', color: m.forfeited ? 'txt-red' : 'txt-green' },
+        bonus: {
+      title: 'Real-Time Bonus Payout',
+      value: `€${m.totalBonus}`,
+      sub: m.forfeited
+        ? 'Forfeited (CSAT <75%)'
+        : m.penalty > 0
+          ? `${[m.ahtPenalty ? '-€50 AHT' : '', m.rrPenalty ? '-€25 RR' : ''].filter(Boolean).join(' & ')} | RR: ${m.rrPct !== null ? m.rrPct.toFixed(0) + '%' : 'Void'}`
+          : `RR: ${m.rrPct !== null ? m.rrPct.toFixed(0) + '%' : 'Void'} • Max: €300`,
+      color: m.forfeited ? 'txt-red' : 'txt-green'
+    },
+
     csat: { title: 'CSAT Score', value: m.csatPct !== null ? `${m.csatPct.toFixed(1)}%` : '—', sub: `Bonus: +€${m.csatBonus} (Target 94%+)`, color: m.csatPct === null ? '' : m.csatPct >= 94 ? 'txt-green' : m.csatPct < 75 ? 'txt-red' : 'txt-amber' },
     aht: { title: 'Average AHT', value: m.avgAht !== null ? `${m.avgAht.toFixed(1)}m` : '—', sub: m.avgAht !== null && m.avgAht > 32 ? 'Over 32m (-€50)' : 'Limit: 32.0 mins max', color: m.avgAht !== null && m.avgAht > 32 ? 'txt-red' : 'txt-sky' },
     quality: { title: 'Quality Score (QA)', value: m.avgQual !== null ? `${m.avgQual.toFixed(1)}%` : '—', sub: `Bonus: +€${m.qualBonus} (${tab.qaAudits.length} monits)`, color: m.avgQual !== null && m.avgQual >= 90 ? 'txt-green' : '' },
@@ -279,9 +289,9 @@ function renderCaseTable(tab) {
       const inId = makeEl('input', 'inline-input'); inId.value = c.id;
       const inClient = makeEl('input', 'inline-input'); inClient.value = c.client || '';
       const inAht = makeEl('input', 'inline-input'); inAht.type = 'number'; inAht.step = '0.1'; inAht.value = c.aht;
-      const selCsat = buildSelect(['Positive', 'Negative', 'Pending'], c.csat);
-      const selCrt = buildSelect(['Saved', 'Lost', 'N/A'], c.crt);
-      const selTri = buildSelect(['Saved', 'Lost', 'N/A'], c.triage);
+      const selCsat = buildSelect(['Bounty', 'Doomed', 'Void'], c.csat);
+      const selCrt = buildSelect(['Bounty', 'Doomed', 'Void'], c.crt);
+      const selRr = buildSelect(['Bounty', 'Doomed', 'Void'], c.rr);
 
       const tdAct = makeEl('td', 'text-right');
       const grp = makeEl('div', 'action-group');
@@ -289,7 +299,7 @@ function renderCaseTable(tab) {
       saveBtn.onclick = () => {
         tab.cases.splice(globalIdx, 1, {
           id: inId.value.trim() || c.id, client: inClient.value.trim() || '—',
-          aht: parseFloat(inAht.value) || 0, csat: selCsat.value, crt: selCrt.value, triage: selTri.value, remark: c.remark || ''
+          aht: parseFloat(inAht.value) || 0, csat: selCsat.value, crt: selCrt.value, rr: selRr.value, remark: c.remark || ''
         });
         editingCaseIdx = null; saveState(); render();
       };
@@ -297,17 +307,18 @@ function renderCaseTable(tab) {
       cancelBtn.onclick = () => { editingCaseIdx = null; render(); };
       grp.appendChild(saveBtn); grp.appendChild(cancelBtn); tdAct.appendChild(grp);
 
-      [inId, inClient, inAht, selCsat, selCrt, selTri].forEach(el => { const td = makeEl('td'); td.appendChild(el); tr.appendChild(td); });
+      [inId, inClient, inAht, selCsat, selCrt, selRr].forEach(el => { const td = makeEl('td'); td.appendChild(el); tr.appendChild(td); });
       tr.appendChild(tdAct);
     } else {
       const tdId = makeEl('td', '', c.id); tdId.style.fontWeight = '700';
       const tdClient = makeEl('td', '', c.client || '—');
       const tdAht = makeEl('td', c.aht > 32 ? 'txt-red' : '', `${c.aht}m`);
       const tdCsat = makeEl('td');
-      const tagClass = c.csat === 'Positive' ? 'tag-pos' : c.csat === 'Negative' ? 'tag-neg' : 'tag-neu';
+      const tagClass = c.csat === 'Bounty' ? 'tag-pos' : c.csat === 'Doomed' ? 'tag-neg' : 'tag-neu';
       tdCsat.appendChild(makeEl('span', 'status-tag ' + tagClass, c.csat));
       const tdCrt = makeEl('td', '', c.crt);
-      const tdTri = makeEl('td', '', c.triage);
+      const tdTri = makeEl('td', '', c.rr);
+
 
       const tdAct = makeEl('td', 'text-right');
       const grp = makeEl('div', 'action-group');
@@ -498,17 +509,21 @@ function forgeLiveProphecy() {
     dynamicLines.push(`${m.csatPct.toFixed(1)}% CSAT—haul thy ass toward 94% if thou wantest the full €180.`);
   }
 
+    if (m.rrPct !== null && m.rrPct < 84) {
+    dynamicLines.push(`${m.rrPct.toFixed(1)}% RR! Move thy magicless ass before the €25 RR tax nibbles thy pouch!`);
+  }
   if (m.totalBonus > 0) {
-    dynamicLines.push(`€${m.totalBonus} in shiny gold sits in thy pouch—don’t let a bad survey kick thy ass out of it.`);
+    dynamicLines.push(`€${m.totalBonus} in shiny gold sits in thy pouch—don’t let a Doomed survey kick thy ass out of it.`);
   }
 
   const timelessLines = [
     'get thy royal magicless ass to maintain the AHT before the €50 troll collects.',
     'save that CRT or kiss thy +€80 bounty’s ass goodbye.',
-    'an auditor is sniffing around thy last call—cover thy triage ass!',
+    'an auditor is sniffing around thy last SQS monit—cover thy royal ass!',
     'slay the queue before the queue hands thy ass back to thee on a silver platter.',
     'even a level-99 Archmage gets his ass handed to him by a Friday 4:55 PM portal.'
   ];
+
 
   const pool = [...dynamicLines, ...timelessLines];
   const opener = openers[Math.floor(Math.random() * openers.length)];
