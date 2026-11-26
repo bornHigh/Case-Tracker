@@ -85,19 +85,20 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .app-shell { display: flex; flex: 1; height: calc(100vh - 69px); }
 
+/* Make sidebar shell transparent so inner cards float cleanly over the wallpaper */
 aside {
-  width: 268px;
-  background: rgba(13, 18, 34, 0.85);
-  backdrop-filter: blur(14px);
-  border-right: 1px solid var(--border);
-  padding: 18px 14px;
+  width: 265px;
+  background: transparent;
+  backdrop-filter: none;
+  border-right: none;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   flex-shrink: 0;
-  height: 100%;
 }
+
 
 .sidebar-top { display: flex; flex-direction: column; min-height: 0; flex: 1; }
 .sidebar-label {
