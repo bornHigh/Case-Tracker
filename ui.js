@@ -46,10 +46,11 @@ function getStaticLeafSnapshot(cb) {
   }, { once: true });
 }
 
+let cachedLeafPng = null;
+
 function getActiveLeafCanvas(railId) {
   if (activeLeafPlayers[railId]) return activeLeafPlayers[railId].canvas;
   const canvas = makeEl('canvas', 'leaf-video');
-  canvas.width = 360; canvas.height = 360;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   const vid = document.createElement('video');
   vid.src = './wallpapers/Leaf-active.mp4';
@@ -60,12 +61,17 @@ function getActiveLeafCanvas(railId) {
 
   const loop = () => {
     if (!player.running) return;
-    if (vid.readyState >= 2) {
-      const w = Math.max(vid.videoWidth || 360, 360);
-      const h = Math.max(vid.videoHeight || 360, 360);
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-      ctx.drawImage(vid, 0, 0, w, h);
-      keyAlphaFrame(ctx, w, h);
+    if (vid.readyState >= 2 && vid.videoWidth > 0) {
+      if (canvas.width !== vid.videoWidth || canvas.height !== vid.videoHeight) {
+        canvas.width = vid.videoWidth;
+        canvas.height = vid.videoHeight;
+      }
+      ctx.drawImage(vid, 0, 0, canvas.width, canvas.height);
+      keyAlphaFrame(ctx, canvas.width, canvas.height);
+      if (!cachedLeafPng && vid.currentTime > 0.05) {
+        cachedLeafPng = canvas.toDataURL('image/png');
+        document.querySelectorAll('img.leaf-static').forEach(img => { img.src = cachedLeafPng; });
+      }
     }
     requestAnimationFrame(loop);
   };
@@ -84,6 +90,8 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   while (rail.children.length > totalPages) rail.removeChild(rail.lastChild);
 
+  const activeCanvas = getActiveLeafCanvas(railId);
+
   for (let p = 0; p < totalPages; p++) {
     const isActive = p === currentPage;
     let leaf = rail.children[p];
@@ -96,19 +104,17 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     leaf.onclick = () => { if (p !== currentPage) onSelect(p); };
 
     if (isActive) {
-      const activeCanvas = getActiveLeafCanvas(railId);
       if (leaf.firstChild !== activeCanvas) { clearEl(leaf); leaf.appendChild(activeCanvas); }
       activeLeafPlayers[railId].start();
-    } else if (!leaf.querySelector('img.leaf-video')) {
+    } else if (!leaf.querySelector('img.leaf-static')) {
       clearEl(leaf);
-      const img = makeEl('img', 'leaf-video');
+      const img = makeEl('img', 'leaf-video leaf-static');
       img.alt = `Page ${p + 1}`;
-      getStaticLeafSnapshot(url => { if (img.isConnected) img.src = url; });
+      if (cachedLeafPng) img.src = cachedLeafPng;
       leaf.appendChild(img);
     }
   }
 }
-
 
 function makeMonthButton(t, activeId) {
   const btn = makeEl('button', 'month-btn' + (t.id === activeId ? ' active' : ''));
