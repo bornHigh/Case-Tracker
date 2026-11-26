@@ -408,6 +408,136 @@ function renderQaTable(tab) {
     qaBody.appendChild(tr);
   });
 }
+
+/* Procedural Sacred Geometry Forge: Generates thousands of unique transmutation circles */
+function forgeProceduralSeal() {
+  const points =[Math.floor(Math.random() * 7)];
+  const step = Math.max(2, Math.floor(points / 2) - (points % 2 === 0 ? 1 : 0));
+  const outerR = 49;
+  const midR = 33 + Math.floor(Math.random() * 6);
+  const innerR = 14 + Math.floor(Math.random() * 6);
+  const glyphPool = ['☉', '☽', '☿', '♀', '♂', '♃', '♄', '⚶', '✦', '❖', '☥', '⚚', '∆', '∇', '⊕'];
+
+  // Build star-polygon vertices via trigonometry
+  const verts = [];
+  for (let i = 0; i < points; i++) {
+    const a = (i * 2 * Math.PI) / points - Math.PI / 2;
+    verts.push([60 + outerR * Math.cos(a), 60 + outerR * Math.sin(a)]);
+  }
+
+  let starPath = '';
+  for (let i = 0; i < points; i++) {
+    const [x1, y1] = verts[i];
+    const [x2, y2] = verts[(i + step) % points];
+    starPath += `M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)} `;
+  }
+
+  // Build satellite planetary medallions & alchemical glyphs at outer nodes
+  let nodesSvg = '';
+  const stride = points > 8 ? 2 : 1;
+  for (let i = 0; i < points; i += stride) {
+    const [nx, ny] = verts[i];
+    const g = glyphPool[(i + Math.floor(Math.random() * glyphPool.length)) % glyphPool.length];
+    nodesSvg += `
+      <circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="5.5" fill="#0d1222" stroke="#fde047" stroke-width="1"/>
+      <text x="${nx.toFixed(1)}" y="${(ny + 2.5).toFixed(1)}" text-anchor="middle" font-size="6.5" fill="#fde047" stroke="none">${g}</text>
+    `;
+  }
+
+  // Inner counter-rotating polygon
+  const innerSides =[Math.floor(Math.random() * 4)];
+  const innerPoly = Array.from({ length: innerSides }, (_, i) => {
+    const a = (i * 2 * Math.PI) / innerSides;
+    return `${(60 + midR * Math.cos(a)).toFixed(1)},${(60 + midR * Math.sin(a)).toFixed(1)}`;
+  }).join(' ');
+
+  return `
+    <svg viewBox="0 0 120 120" fill="none" stroke="#f3d266" stroke-width="1">
+      <circle cx="60" cy="60" r="56" stroke-opacity="0.75"/>
+      <circle cx="60" cy="60" r="52" stroke-dasharray="1.5 2.5" stroke-opacity="0.85"/>
+      <circle cx="60" cy="60" r="${midR}" stroke-opacity="0.65"/>
+      <g class="oracle-spin-cw">
+        <path d="${starPath}" stroke="#fde047" stroke-width="1"/>
+        ${nodesSvg}
+      </g>
+      <g class="oracle-spin-ccw">
+        <polygon points="${innerPoly}" stroke="#f3d266" stroke-opacity="0.9"/>
+        <circle cx="60" cy="60" r="${innerR}" stroke-dasharray="2 2"/>
+      </g>
+      <circle cx="60" cy="60" r="4" fill="#fde047"/>
+    </svg>`;
+}
+
+/* Combinatorial Live-KPI Fantasy Prophecy Engine (Cheeky Tavern Edition) */
+function forgeLiveProphecy() {
+  const tab = getActiveTab();
+  const m = computeMetrics(tab);
+
+  const openers = [
+    'The High Astrolabe decrees:',
+    'Hear ye, weary peasant:',
+    'By the Sacred Ledger of Lisbon:',
+    'The Scrying Glass whispers:',
+    'Heed the Archmage’s warning:',
+    'From the Tavern of Lost Tickets:'
+  ];
+
+  // Live stat-aware prophecies mixed with cheeky medieval queue banter
+  const dynamicLines = [];
+  if (m.avgAht !== null && m.avgAht > 32) {
+    dynamicLines.push(`get thy royal magicless ass in gear—${m.avgAht.toFixed(1)}m AHT just summoned the €50 Shadow Tax!`);
+  } else if (m.avgAht !== null) {
+    dynamicLines.push(`thy ${m.avgAht.toFixed(1)}m AHT keeps thy ass safely out of the 32m dragon’s jaws.`);
+  }
+
+  if (m.csatPct !== null && m.csatPct >= 94) {
+    dynamicLines.push(`${m.csatPct.toFixed(1)}% CSAT! Sit thy sovereign ass upon that +€180 throne!`);
+  } else if (m.csatPct !== null && m.csatPct < 75) {
+    dynamicLines.push(`${m.csatPct.toFixed(1)}% CSAT?! Save thy ass before the €300 coffer turns to ash!`);
+  } else if (m.csatPct !== null) {
+    dynamicLines.push(`${m.csatPct.toFixed(1)}% CSAT—haul thy ass toward 94% if thou wantest the full €180.`);
+  }
+
+  if (m.totalBonus > 0) {
+    dynamicLines.push(`€${m.totalBonus} in shiny gold sits in thy pouch—don’t let a bad survey kick thy ass out of it.`);
+  }
+
+  const timelessLines = [
+    'get thy royal magicless ass to maintain the AHT before the €50 troll collects.',
+    'save that CRT or kiss thy +€80 bounty’s ass goodbye.',
+    'an auditor is sniffing around thy last call—cover thy triage ass!',
+    'slay the queue before the queue hands thy ass back to thee on a silver platter.',
+    'even a level-99 Archmage gets his ass handed to him by a Friday 4:55 PM portal.'
+  ];
+
+  const pool = [...dynamicLines, ...timelessLines];
+  const opener = openers[Math.floor(Math.random() * openers.length)];
+  const body = pool[Math.floor(Math.random() * pool.length)];
+  return `“${opener} ${body}”`;
+}
+
+/* Automatically alternate between a newly forged procedural seal OR live prophecy */
+function shiftArcaneRelic() {
+  const host = document.getElementById('oracleDisplay');
+  if (!host) return;
+
+  host.style.animation = 'none';
+  host.offsetHeight; // Replay fade-in transition
+  host.style.animation = '';
+
+  if (Math.random() < 0.5) {
+    host.innerHTML = `<div class="oracle-sigil-only">${forgeProceduralSeal()}</div>`;
+  } else {
+    host.innerHTML = `
+      <div class="oracle-quote-only">
+        <span class="oracle-rune-divider">✦ ─── ✦</span>
+        ${forgeLiveProphecy()}
+        <span class="oracle-rune-divider">✦ ─── ✦</span>
+      </div>`;
+  }
+}
+
+
 function render() {
   const tab = getActiveTab();
   const m = computeMetrics(tab);
@@ -624,6 +754,19 @@ document.addEventListener('DOMContentLoaded', () => {
     a.download = `${tab.name.replace(/\s+/g, '_')}_CaseFlow_Arcane.csv`;
     a.click();
   });
+
+  // Trigger procedural seal / prophecy shifts on meaningful tracker actions
+  ['caseForm', 'qaForm'].forEach(id => {
+    const f = document.getElementById(id);
+    if (f) f.addEventListener('submit', shiftArcaneRelic);
+  });
+  ['archiveBtn', 'returnActiveBtn', 'exportBtn'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.addEventListener('click', shiftArcaneRelic);
+  });
+  document.getElementById('activeMonthSlot').addEventListener('click', shiftArcaneRelic);
+  document.getElementById('archivedMonthsList').addEventListener('click', shiftArcaneRelic);
+  shiftArcaneRelic();
 
   render();
 });
