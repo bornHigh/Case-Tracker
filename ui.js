@@ -635,7 +635,7 @@ function openSearchModal(query) {
       const grid = makeEl('div', 'search-hit-grid');
       grid.appendChild(makeEl('div', '', `AHT: ${c.aht} mins`));
       grid.appendChild(makeEl('div', '', `CRT NE: ${c.crt}`));
-      grid.appendChild(makeEl('div', '', `Triage: ${c.triage}`));
+      grid.appendChild(makeEl('div', '', `RR: ${c.rr}`));
       card.appendChild(header); card.appendChild(grid);
       if (c.remark) card.appendChild(makeEl('div', 'search-hit-remark', `💬 Remarks: ${c.remark}`));
       container.appendChild(card);
