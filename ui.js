@@ -516,66 +516,103 @@ function forgeLiveProphecy() {
   return `“${opener} ${body}”`;
 }
 
-/* Renders the Sleek Charred-Edge Relic Scroll with 3D Rolled Cylinders & Crimson Wax Seal */
+/* Renders a Dark-Fantasy Charred Relic Scroll with Crinkled Paper Lighting, Ember Glow & Smoke Wisps */
 function buildBurntScrollSvg(withWaxSeal) {
   const uid = Math.random().toString(36).slice(2, 6);
   const waxMarkup = withWaxSeal ? `
-    <g transform="translate(126, 44)">
-      <circle cx="0" cy="1" r="13" fill="rgba(20, 5, 5, 0.55)"/>
-      <path d="M-11,-3 C-13,-9 -5,-13 1,-12 C8,-13 13,-7 11,0 C13,7 7,13 0,12 C-7,13 -13,7 -11,-3 Z" fill="url(#waxGrad_${uid})" stroke="#450a0a" stroke-width="0.9"/>
-      <circle cx="0" cy="0" r="8" fill="none" stroke="#fca5a5" stroke-opacity="0.35" stroke-width="0.8"/>
-      <text x="0" y="3.5" text-anchor="middle" font-size="10" fill="#fecaca" font-family="serif">⚜</text>
+    <g transform="translate(168, 56)">
+      <circle cx="0" cy="2" r="15" fill="rgba(10, 3, 2, 0.72)"/>
+      <path d="M-13,-4 C-15,-11 -6,-15 1,-14 C9,-15 15,-8 13,0 C15,8 8,15 0,14 C-8,15 -15,8 -13,-4 Z" fill="url(#waxGrad_${uid})" stroke="#2a0404" stroke-width="1.1"/>
+      <circle cx="0" cy="0" r="9.5" fill="none" stroke="#fca5a5" stroke-opacity="0.32" stroke-width="0.9"/>
+      <text x="0" y="4" text-anchor="middle" font-size="11" fill="#fecaca" font-family="serif">⚜</text>
     </g>` : '';
 
   return `
-    <svg class="scroll-art-bg" viewBox="0 0 180 230" preserveAspectRatio="none">
+    <svg class="scroll-art-bg" viewBox="0 0 220 340" preserveAspectRatio="none">
       <defs>
-        <radialGradient id="parchmentGrad_${uid}" cx="50%" cy="50%" r="65%">
-          <stop offset="0%" stop-color="#d6b47c"/>
-          <stop offset="58%" stop-color="#a87b43"/>
-          <stop offset="86%" stop-color="#6b441e"/>
-          <stop offset="100%" stop-color="#2b1708"/>
+        <!-- Warm Ember-Lit Center to Deep Charred Black-Brown Edges -->
+        <radialGradient id="parchmentGrad_${uid}" cx="50%" cy="50%" r="62%">
+          <stop offset="0%" stop-color="#f6d594"/>
+          <stop offset="38%" stop-color="#c9934b"/>
+          <stop offset="72%" stop-color="#6b3e19"/>
+          <stop offset="92%" stop-color="#291407"/>
+          <stop offset="100%" stop-color="#120803"/>
         </radialGradient>
+
+        <!-- Glowing Golden-Amber Magic Aura inside Scroll -->
+        <radialGradient id="emberGlow_${uid}" cx="50%" cy="52%" r="45%">
+          <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.48"/>
+          <stop offset="55%" stop-color="#d97706" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Gnarled Dark Wood & Aged Parchment Roll Shading -->
         <linearGradient id="rollGrad_${uid}" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#3b210d"/>
-          <stop offset="28%" stop-color="#c49a5b"/>
-          <stop offset="55%" stop-color="#8c5d2b"/>
-          <stop offset="85%" stop-color="#3a1f0b"/>
-          <stop offset="100%" stop-color="#1c0d04"/>
+          <stop offset="0%" stop-color="#1a0d05"/>
+          <stop offset="22%" stop-color="#9c6b34"/>
+          <stop offset="48%" stop-color="#d4a663"/>
+          <stop offset="78%" stop-color="#4a2910"/>
+          <stop offset="100%" stop-color="#120803"/>
         </linearGradient>
+
         <radialGradient id="waxGrad_${uid}" cx="35%" cy="30%" r="70%">
-          <stop offset="0%" stop-color="#ef4444"/>
-          <stop offset="55%" stop-color="#991b1b"/>
-          <stop offset="100%" stop-color="#450a0a"/>
+          <stop offset="0%" stop-color="#dc2626"/>
+          <stop offset="58%" stop-color="#7f1d1d"/>
+          <stop offset="100%" stop-color="#2b0606"/>
         </radialGradient>
-        <filter id="burnEdge_${uid}" x="-8%" y="-5%" width="116%" height="110%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.065" numOctaves="4" seed="7" result="noise"/>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="5.5" xChannelSelector="R" yChannelSelector="G"/>
+
+        <!-- Organic Torn & Burnt Edge Displacement -->
+        <filter id="burnEdge_${uid}" x="-10%" y="-6%" width="120%" height="112%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.055" numOctaves="5" seed="11" result="noise"/>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="7.5" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+
+        <!-- Realistic Crinkled Parchment Fiber Texture -->
+        <filter id="paperGrain_${uid}" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.14" numOctaves="4" seed="3" result="grain"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 0.15  0 0 0 0 0.08  0 0 0 0 0.02  0 0 0 0.24 0"/>
+        </filter>
+
+        <!-- Soft Ethereal Arcane Smoke Wisps -->
+        <filter id="smokeBlur_${uid}" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="7"/>
         </filter>
       </defs>
 
+      <!-- Subtle Ethereal Smoke Wisps Curling Around Flanks -->
+      <ellipse cx="18" cy="195" rx="22" ry="48" fill="rgba(226, 232, 240, 0.14)" filter="url(#smokeBlur_${uid})"/>
+      <ellipse cx="202" cy="145" rx="20" ry="52" fill="rgba(226, 232, 240, 0.13)" filter="url(#smokeBlur_${uid})"/>
+
       <!-- Jagged Burnt-Edge Parchment Sheet -->
-      <path d="M22,22 L158,22 L156,56 L160,88 L155,124 L159,162 L156,208 L24,208 L21,168 L25,130 L20,92 L24,54 Z"
-            fill="url(#parchmentGrad_${uid})" stroke="#1f0f04" stroke-width="2.2" filter="url(#burnEdge_${uid})"/>
+      <path d="M26,28 L194,28 L191,78 L196,128 L190,178 L195,232 L192,312 L28,312 L24,242 L29,186 L23,132 L28,76 Z"
+            fill="url(#parchmentGrad_${uid})" stroke="#140903" stroke-width="3" filter="url(#burnEdge_${uid})"/>
 
-      <!-- Inner Charred Vignette Shadow -->
-      <rect x="24" y="24" width="132" height="182" fill="none" stroke="#291406" stroke-width="5" stroke-opacity="0.45" filter="url(#burnEdge_${uid})"/>
+      <!-- Fibrous Crinkled Paper Grain Overlay -->
+      <path d="M26,28 L194,28 L191,78 L196,128 L190,178 L195,232 L192,312 L28,312 L24,242 L29,186 L23,132 L28,76 Z"
+            filter="url(#paperGrain_${uid})" opacity="0.85"/>
 
-      <!-- Top Rolled Parchment Cylinder & Spiral Ends -->
-      <rect x="10" y="10" width="160" height="18" rx="7" fill="url(#rollGrad_${uid})" stroke="#1f0f04" stroke-width="1.3"/>
-      <ellipse cx="12" cy="19" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
-      <ellipse cx="168" cy="19" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
+      <!-- Heavy Charred Outer Burn Rim -->
+      <path d="M28,30 L192,30 L190,170 L192,310 L28,310 L26,170 Z"
+            fill="none" stroke="#1a0b03" stroke-width="8" stroke-opacity="0.62" filter="url(#burnEdge_${uid})"/>
 
-      <!-- Bottom Rolled Parchment Cylinder & Spiral Ends -->
-      <rect x="10" y="202" width="160" height="18" rx="7" fill="url(#rollGrad_${uid})" stroke="#1f0f04" stroke-width="1.3"/>
-      <ellipse cx="12" cy="211" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
-      <ellipse cx="168" cy="211" rx="4.5" ry="8" fill="#2b1608" stroke="#8c5d2b" stroke-width="1"/>
+      <!-- Inner Warm Ember Magic Glow -->
+      <ellipse cx="110" cy="172" rx="76" ry="118" fill="url(#emberGlow_${uid})"/>
+
+      <!-- Top Rolled Parchment Cylinder with Flared Gnarled Horns -->
+      <path d="M8,14 Q110,19 212,14 L215,32 Q110,36 5,32 Z" fill="url(#rollGrad_${uid})" stroke="#140903" stroke-width="1.6" filter="url(#burnEdge_${uid})"/>
+      <ellipse cx="7" cy="23" rx="5.5" ry="9.5" fill="#1f1006" stroke="#8c5d2b" stroke-width="1.2"/>
+      <ellipse cx="213" cy="23" rx="5.5" ry="9.5" fill="#1f1006" stroke="#8c5d2b" stroke-width="1.2"/>
+
+      <!-- Bottom Rolled Parchment Cylinder with Flared Gnarled Horns -->
+      <path d="M5,308 Q110,304 215,308 L212,326 Q110,321 8,326 Z" fill="url(#rollGrad_${uid})" stroke="#140903" stroke-width="1.6" filter="url(#burnEdge_${uid})"/>
+      <ellipse cx="7" cy="317" rx="5.5" ry="9.5" fill="#1f1006" stroke="#8c5d2b" stroke-width="1.2"/>
+      <ellipse cx="213" cy="317" rx="5.5" ry="9.5" fill="#1f1006" stroke="#8c5d2b" stroke-width="1.2"/>
 
       ${waxMarkup}
     </svg>`;
 }
 
-/* Automatically unroll the sleek charred scroll with either glowing ember runes OR a wax-sealed decree */
+/* Automatically unroll the dark-fantasy charred scroll with glowing ember runes OR a wax-sealed decree */
 function shiftArcaneRelic() {
   const host = document.getElementById('oracleDisplay');
   if (!host) return;
@@ -585,19 +622,20 @@ function shiftArcaneRelic() {
   host.style.animation = '';
 
   if (Math.random() < 0.5) {
-    const emberSeal = forgeProceduralSeal()
-      .replace(/#f3d266/g, '#451a03')
-      .replace(/#fde047/g, '#78350f');
+    // Keep glowing golden-ember strokes so the pentacle/alchemy circle radiates like the reference image
+    const glowingSeal = forgeProceduralSeal()
+      .replace(/#f3d266/g, '#fef08a')
+      .replace(/#fde047/g, '#fbbf24');
     host.innerHTML = `
       ${buildBurntScrollSvg(false)}
       <div class="scroll-content-layer">
-        <div class="oracle-sigil-only">${emberSeal}</div>
+        <div class="oracle-sigil-only">${glowingSeal}</div>
       </div>`;
   } else {
     host.innerHTML = `
       ${buildBurntScrollSvg(true)}
       <div class="scroll-content-layer">
-        <div class="oracle-quote-only" style="padding-top:14px;">
+        <div class="oracle-quote-only" style="padding-top:18px; font-size:11px; line-height:1.54;">
           <span class="oracle-rune-divider">✦ ─── ✦</span>
           ${forgeLiveProphecy()}
           <span class="oracle-rune-divider">✦ ─── ✦</span>
@@ -605,7 +643,6 @@ function shiftArcaneRelic() {
       </div>`;
   }
 }
-
 
 function render() {
   const tab = getActiveTab();
