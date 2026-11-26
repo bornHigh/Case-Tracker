@@ -99,8 +99,9 @@ aside {
   flex-shrink: 0;
 }
 
+/* Remove flex: 1 so the scroll floats dead-center in the open sidebar sky */
+.sidebar-top { display: flex; flex-direction: column; min-height: 0; flex-shrink: 0; }
 
-.sidebar-top { display: flex; flex-direction: column; min-height: 0; flex: 1; }
 .sidebar-label {
   font-size: 11px; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.08em; color: var(--text-muted);
@@ -132,17 +133,16 @@ aside {
 .badge-active { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; }
 .badge-archived { background: rgba(165, 180, 252, 0.2); color: #e0e7ff; }
 
-/* Floating Levitating Parchment Scroll (Centered in Open Sidebar Sky, No Box) */
+/* Floating Sleek Ancient Burnt Scroll (Centered Dead-Middle in Open Sidebar Sky) */
 .arcane-oracle-card {
-  margin: auto 0;
+  margin: auto;
   background: transparent;
   border: none;
-  padding: 4px 6px;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
-  /* Continuous gentle air-drift levitation */
   animation: scrollLevitate 4.8s ease-in-out infinite;
 }
 
@@ -153,65 +153,49 @@ aside {
 
 .oracle-display {
   position: relative;
-  width: 218px;
-  padding: 20px 16px;
-  /* Aged parchment texture with burnt vignette edges */
-  background: radial-gradient(ellipse at center, #f3e2be 0%, #dfc18d 68%, #b3874c 100%);
-  color: #2b180a;
-  border-radius: 3px;
-  box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.72),
-    inset 0 0 18px rgba(92, 53, 18, 0.55);
-  transform-origin: top center;
-  /* Unrolls smoothly whenever a new seal or prophecy triggers */
-  animation: scrollUnroll 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Top & Bottom Rolled Wooden Scroll Cylinders */
-.oracle-display::before,
-.oracle-display::after {
-  content: '';
-  position: absolute;
-  left: -10px;
-  right: -10px;
-  height: 14px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #6e4726 0%, #d8b57c 35%, #8c5c32 72%, #3d2410 100%);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.75), inset 0 1px 2px rgba(255, 240, 200, 0.5);
-  z-index: 3;
-}
-.oracle-display::before { top: -7px; }
-.oracle-display::after { bottom: -7px; }
-
-@keyframes scrollUnroll {
-  0% { opacity: 0; transform: scaleY(0.18) translateY(-14px); }
-  100% { opacity: 1; transform: scaleY(1) translateY(0); }
-}
-
-/* Crimson Royal Wax Seal stamped on top-right of parchment */
-.scroll-wax-seal {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #dc2626, #7f1d1d 80%);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.55), inset 0 0 4px rgba(255, 180, 180, 0.45);
-  border: 1.5px solid #991b1b;
+  width: 168px;
+  min-height: 215px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  color: #fca5a5;
+  transform-origin: top center;
+  filter: drop-shadow(0 16px 26px rgba(0, 0, 0, 0.85));
+  animation: scrollUnroll 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Etched Alchemy Circle inside Parchment */
+@keyframes scrollUnroll {
+  0% { opacity: 0; transform: scaleY(0.16) translateY(-14px); }
+  100% { opacity: 1; transform: scaleY(1) translateY(0); }
+}
+
+/* Photorealistic Burnt-Edge SVG Scroll Backdrop */
+.scroll-art-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Content Layer Floating Over the Charred Parchment */
+.scroll-content-layer {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 34px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Etched Alchemy Circle inside Charred Parchment */
 .oracle-sigil-only {
-  width: 112px;
-  height: 112px;
-  margin: 2px auto;
-  filter: drop-shadow(0 0 5px rgba(146, 64, 14, 0.45));
+  width: 104px;
+  height: 104px;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.55));
 }
 .oracle-sigil-only svg { width: 100%; height: 100%; overflow: visible; }
 .oracle-spin-cw { transform-origin: 60px 60px; animation: spinCW 34s linear infinite; }
@@ -219,27 +203,26 @@ aside {
 @keyframes spinCW { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 @keyframes spinCCW { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
 
-/* Dark Ink Calligraphy Prophecy on Parchment */
+/* Antique Sepia Ink Calligraphy on Charred Parchment */
 .oracle-quote-only {
   font-family: 'Cinzel', Georgia, serif;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  line-height: 1.48;
-  color: #2b180a;
+  line-height: 1.46;
+  color: #1e1005;
   font-style: italic;
-  padding-right: 14px;
   text-align: left;
+  text-shadow: 0 1px 0 rgba(255, 235, 200, 0.35);
 }
 .oracle-rune-divider {
   display: block;
   font-style: normal;
-  font-size: 9px;
-  letter-spacing: 0.22em;
-  color: #78350f;
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  color: #5c2d0c;
   margin: 4px 0;
   text-align: center;
 }
-
 
 .rules-box {
   background: var(--bg-card); border: 1px solid var(--border);
