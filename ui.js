@@ -161,7 +161,38 @@ function createRunicPageSeal(pageIndex, isActive) {
   return svg;
 }
 
-// Render the vertical Ethereal Bifrost Runic Paginator rail alongside each table
+// Forge an ornate winged Bifrost Runic Spearhead SVG for Previous ('up') / Next ('down') page turns
+function createRunicArrowSvg(direction, isDisabled) {
+  const SVG_NS = 'http://' + 'www.w3.org' + '/2000/svg';
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 48 30');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.style.width = '36px';
+  svg.style.height = '22px';
+  svg.style.overflow = 'visible';
+  svg.style.transform = direction === 'down' ? 'rotate(180deg)' : 'none';
+  svg.style.filter = isDisabled
+    ? 'none'
+    : 'drop-shadow(0 0 6px rgba(56, 189, 248, 0.7)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.85))';
+
+  const wingStroke = isDisabled ? 'rgba(148, 163, 184, 0.35)' : '#38bdf8';
+  const goldAccent = isDisabled ? 'rgba(251, 191, 36, 0.25)' : '#fbbf24';
+  const gemFill    = isDisabled ? '#1e293b' : '#e0f2fe';
+
+  svg.innerHTML = `
+    <!-- Outer Elven-Norse winged spearhead chevron -->
+    <path d="M 6,23 L 24,5 L 42,23 L 34,23 L 24,13 L 14,23 Z"
+          fill="rgba(8, 47, 73, 0.85)" stroke="${wingStroke}" stroke-width="1.6" stroke-linejoin="round" />
+    <!-- Gold filigree wing tips & inner runic spine -->
+    <path d="M 3,25 L 11,17 M 45,25 L 37,17" stroke="${goldAccent}" stroke-width="1.4" stroke-linecap="round" />
+    <line x1="24" y1="14" x2="24" y2="27" stroke="${goldAccent}" stroke-width="1.4" stroke-linecap="round" />
+    <!-- Glowing Bifrost diamond core gem -->
+    <polygon points="24,16 28,21 24,26 20,21" fill="${gemFill}" stroke="${wingStroke}" stroke-width="1.2" />
+  `;
+  return svg;
+}
+
+// Render the vertical Ethereal Bifrost Runic Paginator with a capped 3-seal sliding window
 function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const rail = document.getElementById(railId);
   if (!rail) return;
@@ -169,7 +200,7 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   clearEl(rail);
 
-  // Helper to trigger a brief Bifrost light-sweep across the adjacent table on page turn
+  // Trigger a brief Bifrost light-sweep across the adjacent table on page turn
   const triggerPageTurn = (targetPage) => {
     if (targetPage === currentPage || targetPage < 0 || targetPage >= totalPages) return;
     const wrap = rail.parentElement ? rail.parentElement.querySelector('.table-wrap') : null;
@@ -181,17 +212,26 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
     onSelect(targetPage);
   };
 
-  // Top "Previous Page" Bifrost chevron button
-  const prevBtn = makeEl('button', 'rune-nav-btn', '▲');
+  // Top ornate Bifrost Spearhead button (Previous Page)
+  const prevBtn = makeEl('button', 'rune-nav-btn');
   prevBtn.type = 'button';
-  prevBtn.title = 'Previous Chronicle Page';
+  prevBtn.title = `Previous Page (${currentPage + 1} of ${totalPages})`;
   prevBtn.disabled = currentPage <= 0;
+  prevBtn.appendChild(createRunicArrowSvg('up', prevBtn.disabled));
   prevBtn.onclick = () => triggerPageTurn(currentPage - 1);
   rail.appendChild(prevBtn);
 
-  // Vertical ley-line spine holding the glowing page rune seals
+  // Sliding 3-seal window so 100+ cases / 20+ monits never stretch the rail past the table height
+  const maxVisible = 3;
+  let winStart = Math.max(0, currentPage - 1);
+  let winEnd = Math.min(totalPages, winStart + maxVisible);
+  if (winEnd - winStart < maxVisible) {
+    winStart = Math.max(0, winEnd - maxVisible);
+  }
+
+  // Vertical ley-line spine holding the windowed Runic Page Seals
   const spine = makeEl('div', 'rune-ley-spine');
-  for (let p = 0; p < totalPages; p++) {
+  for (let p = winStart; p < winEnd; p++) {
     const isActive = p === currentPage;
     const nodeBtn = makeEl('button', 'leaf-btn' + (isActive ? ' active' : ''));
     nodeBtn.type = 'button';
@@ -202,15 +242,15 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   }
   rail.appendChild(spine);
 
-  // Bottom "Next Page" Bifrost chevron button
-  const nextBtn = makeEl('button', 'rune-nav-btn', '▼');
+  // Bottom ornate Bifrost Spearhead button (Next Page)
+  const nextBtn = makeEl('button', 'rune-nav-btn');
   nextBtn.type = 'button';
-  nextBtn.title = 'Next Chronicle Page';
+  nextBtn.title = `Next Page (${currentPage + 1} of ${totalPages})`;
   nextBtn.disabled = currentPage >= totalPages - 1;
+  nextBtn.appendChild(createRunicArrowSvg('down', nextBtn.disabled));
   nextBtn.onclick = () => triggerPageTurn(currentPage + 1);
   rail.appendChild(nextBtn);
 }
-
 
 function makeMonthButton(t, activeId) {
   const btn = makeEl('button', 'month-btn' + (t.id === activeId ? ' active' : ''));
