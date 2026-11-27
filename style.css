@@ -334,16 +334,104 @@ main {
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .section-header h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
 
-/* Slightly slimmer KPI cards to reclaim ~16px of vertical height */
-.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; flex-shrink: 0; }
-.kpi-card {
-  border-radius: 11px; padding: 8px 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
-  transition: transform 0.18s ease, border-color 0.18s ease;
+/* =========================================================
+   Circular Arcane Runic KPI Medallions (5-Orb HUD)
+   ========================================================= */
+.kpi-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 4px;
+  flex-shrink: 0;
 }
-.kpi-card:hover { border-color: #a78bfa; transform: translateY(-2px); }
-.kpi-top { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
-.kpi-value { font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
-.kpi-sub { font-size: 10px; color: #cbd5e1; margin-top: 1px; }
+
+.kpi-card.kpi-orb {
+  position: relative;
+  width: 158px;
+  height: 158px;
+  border-radius: 50%;
+  background: transparent !important;
+  border: none !important;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 12px var(--orb-glow, rgba(56, 189, 248, 0.4)));
+  transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), filter 0.24s ease;
+}
+
+.kpi-card.kpi-orb:hover {
+  transform: translateY(-3px) scale(1.04);
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 18px var(--orb-glow, rgba(56, 189, 248, 0.65)));
+}
+
+/* Subtle crimson doom pulse when a metric triggers a penalty or forfeit */
+.kpi-card.kpi-orb.orb-alert {
+  animation: orbDoomPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes orbDoomPulse {
+  0%, 100% { filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 10px rgba(239, 68, 68, 0.5)); }
+  50%      { filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 22px rgba(239, 68, 68, 0.9)); }
+}
+
+.kpi-orb-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Centered text sanctuary inside each circular rune ring */
+.kpi-orb-core {
+  position: relative;
+  z-index: 2;
+  width: 106px;
+  height: 106px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  gap: 1px;
+}
+
+.orb-grip {
+  font-size: 9px;
+  line-height: 1;
+  opacity: 0.45;
+  margin-bottom: 1px;
+}
+.kpi-card.kpi-orb:hover .orb-grip { opacity: 0.95; }
+
+.kpi-top {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kpi-value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.kpi-sub {
+  font-size: 8.8px;
+  line-height: 1.25;
+  color: #cbd5e1;
+  max-width: 94px;
+}
 
 /* Fill remaining vertical space cleanly inside 100vh with zero scrollbars */
 .panels-grid {
