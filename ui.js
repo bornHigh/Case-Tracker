@@ -472,40 +472,78 @@ function renderSidebarAndCards(tab, m) {
 
     kpiGrid.appendChild(card);
 
-    // Forge a live color-reactive Ley-Line Conduit & Diamond Rune Relay in each gap between orbs
+        // Forge organic astral mist ribbons & drifting fairy wisps in each gap between KPI orbs
     if (idx < state.kpiOrder.length - 1) {
       const nextCard = cardsData[state.kpiOrder[idx + 1]];
       const isDoom = c.color === 'txt-red' || nextCard.color === 'txt-red';
       const isBounty = !isDoom && (c.color === 'txt-green' && nextCard.color === 'txt-green');
       const stateClass = isDoom ? 'conduit-doom' : isBounty ? 'conduit-bounty' : 'conduit-cyan';
 
-      const streamColor = isDoom ? '#ef4444' : isBounty ? '#10b981' : '#38bdf8';
-      const accentColor = isDoom ? '#fca5a5' : isBounty ? '#fbbf24' : '#a5f3fc';
+      const wispCore  = isDoom ? '#fecdd3' : isBounty ? '#fef9c3' : '#e0f2fe';
+      const wispGlow  = isDoom ? '#fb7185' : isBounty ? '#34d399' : '#38bdf8';
+      const mistTone  = isDoom ? '#f43f5e' : isBounty ? '#fbbf24' : '#7dd3fc';
+      const fId       = `wispGlow_${idx}_${Math.random().toString(36).slice(2, 6)}`;
 
       const bridge = makeEl('div', `kpi-conduit ${stateClass}`);
       bridge.setAttribute('aria-hidden', 'true');
 
       const bSvg = document.createElementNS(SVG_NS, 'svg');
-      bSvg.setAttribute('viewBox', '0 0 120 36');
-      bSvg.setAttribute('preserveAspectRatio', 'none');
+      bSvg.setAttribute('viewBox', '0 0 120 72');
+      bSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
       bSvg.setAttribute('class', 'conduit-svg');
       bSvg.innerHTML = `
-        <!-- Dual flanking ley-line energy beams -->
-        <line x1="0" y1="18" x2="48" y2="18" stroke="${streamColor}" stroke-width="1.5" stroke-opacity="0.55" />
-        <line x1="72" y1="18" x2="120" y2="18" stroke="${streamColor}" stroke-width="1.5" stroke-opacity="0.55" />
-        <!-- Traveling mana sparks / crackling crimson energy pulses -->
-        <line x1="0" y1="18" x2="120" y2="18" stroke="${accentColor}" stroke-width="2"
-              stroke-dasharray="${isDoom ? '5 7 2 9' : '8 14'}" stroke-linecap="round">
-          <animate attributeName="stroke-dashoffset" from="${isDoom ? '0' : '44'}" to="${isDoom ? '46' : '0'}"
-                   dur="${isDoom ? '0.9s' : '2.2s'}" repeatCount="indefinite" />
-        </line>
-        <!-- Central rotating diamond rune relay node -->
-        <g>
-          <animateTransform attributeName="transform" type="rotate" from="0 60 18" to="360 60 18"
-                            dur="${isDoom ? '6s' : '14s'}" repeatCount="indefinite" />
-          <polygon points="60,7 71,18 60,29 49,18" fill="rgba(9, 13, 26, 0.92)" stroke="${accentColor}" stroke-width="1.4" />
+        <defs>
+          <!-- Soft multi-stage Gaussian bloom for true fairy-light diffusion -->
+          <filter id="${fId}" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="3.2" result="blurSoft" />
+            <feGaussianBlur stdDeviation="1.1" result="blurCore" />
+            <feMerge>
+              <feMergeNode in="blurSoft" />
+              <feMergeNode in="blurCore" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <path id="${fId}_wave1" d="M 8,40 C 36,16 84,56 112,32" />
+          <path id="${fId}_wave2" d="M 10,30 C 42,54 78,18 110,42" />
+        </defs>
+
+        <!-- Ethereal woven astral mist ribbons (no rigid straight lines) -->
+        <use href="#${fId}_wave1" fill="none" stroke="${wispGlow}" stroke-width="2.4" stroke-opacity="0.24" filter="url(#${fId})" />
+        <use href="#${fId}_wave2" fill="none" stroke="${mistTone}" stroke-width="1.6" stroke-opacity="0.22" filter="url(#${fId})" />
+
+        <!-- Drifting Fairy Fireflies / Smoldering Embers gliding along organic curves -->
+        <g filter="url(#${fId})">
+          <circle r="2.6" fill="${wispCore}">
+            <animateMotion dur="${isDoom ? '3.4s' : '5.2s'}" repeatCount="indefinite">
+              <mpath href="#${fId}_wave1" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.95;0.85;0" dur="${isDoom ? '3.4s' : '5.2s'}" repeatCount="indefinite" />
+          </circle>
+
+          <circle r="1.9" fill="${mistTone}">
+            <animateMotion dur="${isDoom ? '4.1s' : '6.4s'}" begin="1.4s" repeatCount="indefinite">
+              <mpath href="#${fId}_wave2" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.9;0.75;0" dur="${isDoom ? '4.1s' : '6.4s'}" begin="1.4s" repeatCount="indefinite" />
+          </circle>
+
+          <circle r="2.2" fill="${wispCore}">
+            <animateMotion dur="${isDoom ? '3.8s' : '5.8s'}" begin="2.7s" repeatCount="indefinite">
+              <mpath href="#${fId}_wave1" />
+            </animateMotion>
+            <animate attributeName="opacity" values="0;0.85;0.9;0" dur="${isDoom ? '3.8s' : '5.8s'}" begin="2.7s" repeatCount="indefinite" />
+          </circle>
+
+          <!-- Ambient floating fairy dust motes bobbing softly in mid-air -->
+          <circle cx="44" cy="24" r="1.5" fill="${wispCore}">
+            <animate attributeName="cy" values="26;19;26" dur="4.2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.15;0.85;0.15" dur="4.2s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="76" cy="46" r="1.7" fill="${mistTone}">
+            <animate attributeName="cy" values="48;40;48" dur="4.8s" begin="1.1s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.2;0.9;0.2" dur="4.8s" begin="1.1s" repeatCount="indefinite" />
+          </circle>
         </g>
-        <circle cx="60" cy="18" r="2.6" fill="${accentColor}" />
       `;
       bridge.appendChild(bSvg);
       kpiGrid.appendChild(bridge);
