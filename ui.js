@@ -213,17 +213,35 @@ function renderSidebarAndCards(tab, m) {
     const delBtn = makeEl('button', 'archive-del-btn', '✕');
     delBtn.type = 'button';
     delBtn.title = `Delete ${t.name}`;
+        // Open the centered Runic Magic Circle modal instead of generic browser confirm()
     delBtn.onclick = (e) => {
       e.stopPropagation();
-      if (!confirm(`Banish archived chronicle "${t.name}" forever?`)) return;
-      state.tabs = state.tabs.filter(x => x.id !== t.id);
-      if (state.activeTabId === t.id) {
-        const fallback = state.tabs.find(x => !x.archived) || state.tabs[0];
-        if (fallback) state.activeTabId = fallback.id;
-      }
-      saveState();
-      render();
+      const modal = document.getElementById('banishModal');
+      const nameEl = document.getElementById('banishTargetName');
+      const confirmBtn = document.getElementById('confirmBanishBtn');
+      const cancelBtn = document.getElementById('cancelBanishBtn');
+
+      nameEl.textContent = `"${t.name}"`;
+      modal.classList.remove('hidden');
+
+      const closeModal = () => modal.classList.add('hidden');
+
+      // Bind one-time confirmation action for this archived chronicle
+      confirmBtn.onclick = () => {
+        state.tabs = state.tabs.filter(x => x.id !== t.id);
+        if (state.activeTabId === t.id) {
+          const fallback = state.tabs.find(x => !x.archived) || state.tabs;
+          if (fallback) state.activeTabId = fallback.id;
+        }
+        closeModal();
+        saveState();
+        render();
+      };
+
+      cancelBtn.onclick = closeModal;
+      modal.onclick = (ev) => { if (ev.target === modal) closeModal(); };
     };
+
     row.appendChild(btn);
     row.appendChild(delBtn);
     archivedList.appendChild(row);
