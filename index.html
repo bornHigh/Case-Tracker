@@ -272,7 +272,46 @@
       </div>
     </div>
   </div>
-  
+
+    <!-- Runic Magic Circle Banish Confirmation Modal -->
+  <div id="banishModal" class="modal-backdrop hidden">
+    <div class="runic-circle-modal">
+      <!-- Outer & Inner Counter-Rotating SVG Arcane Rings -->
+      <svg class="runic-ring-svg" viewBox="0 0 360 360" aria-hidden="true">
+        <defs>
+          <path id="outerRunePath" d="M 180,180 m -162,0 a 162,162 0 1,1 324,0 a 162,162 0 1,1 -324,0" />
+          <path id="innerRunePath" d="M 180,180 m -134,0 a 134,134 0 1,1 268,0 a 134,134 0 1,1 -268,0" />
+        </defs>
+        <g class="rune-spin-cw">
+          <circle cx="180" cy="180" r="172" class="rune-stroke-gold" />
+          <circle cx="180" cy="180" r="150" class="rune-stroke-dash" />
+          <text class="rune-glyphs">
+            <textPath href="#outerRunePath" startOffset="0%">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ • </textPath>
+          </text>
+        </g>
+        <g class="rune-spin-ccw">
+          <circle cx="180" cy="180" r="142" class="rune-stroke-crimson" />
+          <polygon points="180,44 298,248 62,248" class="rune-sigil-poly" />
+          <polygon points="180,316 298,112 62,112" class="rune-sigil-poly" />
+          <text class="rune-glyphs-inner">
+            <textPath href="#innerRunePath" startOffset="0%">✦ ARCANE SEAL ✦ BANISHMENT RITE ✦ VOID ETERNAL </textPath>
+          </text>
+        </g>
+      </svg>
+
+      <!-- Centered Frosted Core Content -->
+      <div class="runic-core-content">
+        <div class="runic-eyebrow">❧ RITE OF BANISHMENT ❧</div>
+        <h3 class="fancy-title runic-title">Seal Into The Void?</h3>
+        <p class="runic-msg">Banish archived chronicle <strong id="banishTargetName">"—"</strong> forever?</p>
+        <div class="runic-actions">
+          <button type="button" id="confirmBanishBtn" class="btn-banish">Banish</button>
+          <button type="button" id="cancelBanishBtn" class="btn-spare">Spare</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Real Flowing Smoke Turbulence Filter -->
   <svg width="0" height="0" style="position:absolute; pointer-events:none;">
     <defs>
