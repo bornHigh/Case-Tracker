@@ -103,33 +103,59 @@ function toArcaneRoman(num) {
   return out;
 }
 
-// Forge a miniature rotating Runic Seal SVG (Bifrost Cyan when active, Engraved Gold when dormant)
+// Forge a miniature counter-rotating Runic Magic Circle SVG (Bifrost Cyan active, Engraved Gold dormant)
 function createRunicPageSeal(pageIndex, isActive) {
   const svg = document.createElementNS('http://w3.org', 'svg');
-  svg.setAttribute('viewBox', '0 0 64 64');
+  svg.setAttribute('viewBox', '0 0 100 100');
   svg.setAttribute('class', 'rune-page-svg' + (isActive ? ' active' : ''));
   svg.setAttribute('aria-hidden', 'true');
+  svg.style.width = '48px';
+  svg.style.height = '48px';
+  svg.style.overflow = 'visible';
+  svg.style.filter = isActive
+    ? 'drop-shadow(0 0 8px rgba(56, 189, 248, 0.9)) drop-shadow(0 0 16px rgba(129, 140, 248, 0.65))'
+    : 'drop-shadow(0 2px 5px rgba(0, 0, 0, 0.85))';
 
-  const uid = `pgRune_${pageIndex}_${Math.random().toString(36).slice(2, 6)}`;
+  const uid = `pgSeal_${pageIndex}_${Math.random().toString(36).slice(2, 6)}`;
   const roman = toArcaneRoman(pageIndex + 1);
+
+  // Palette switches between vibrant Ethereal Bifrost Cyan (active) and quiet Engraved Gold (dormant)
+  const outerStroke = isActive ? '#38bdf8' : 'rgba(251, 191, 36, 0.42)';
+  const innerStroke = isActive ? '#a5f3fc' : 'rgba(148, 163, 184, 0.35)';
+  const glyphFill   = isActive ? '#e0f2fe' : 'rgba(251, 191, 36, 0.48)';
+  const starStroke  = isActive ? 'rgba(56, 189, 248, 0.55)' : 'rgba(251, 191, 36, 0.2)';
+  const numFill     = isActive ? '#ffffff' : '#94a3b8';
 
   svg.innerHTML = `
     <defs>
-      <path id="${uid}" d="M 32,32 m -23,0 a 23,23 0 1,1 46,0 a 23,23 0 1,1 -46,0" />
+      <path id="${uid}" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
+      <radialGradient id="${uid}_core" cx="50%" cy="40%" r="55%">
+        <stop offset="0%" stop-color="${isActive ? '#0284c7' : '#1e293b'}" stop-opacity="${isActive ? '0.95' : '0.92'}" />
+        <stop offset="100%" stop-color="${isActive ? '#082f49' : '#090d16'}" stop-opacity="0.98" />
+      </radialGradient>
     </defs>
-    <!-- Outer engraved filigree ring -->
-    <circle cx="32" cy="32" r="29" class="pg-ring-outer" />
-    <circle cx="32" cy="32" r="25" class="pg-ring-dash" />
-    <!-- Orbiting Elder Futhark runes -->
-    <g class="pg-rune-orbit">
-      <text class="pg-rune-glyphs">
-        <textPath href="#${uid}" startOffset="0%">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ </textPath>
+
+    <!-- Outer Counter-Clockwise Orbiting Rune Ring -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="${isActive ? '16s' : '60s'}" repeatCount="indefinite" />
+      <circle cx="50" cy="50" r="46" fill="none" stroke="${outerStroke}" stroke-width="${isActive ? '2.2' : '1.4'}" />
+      <circle cx="50" cy="50" r="33" fill="none" stroke="${innerStroke}" stroke-width="1.2" stroke-dasharray="3 4" />
+      <text fill="${glyphFill}" font-size="8.2" font-weight="700" letter-spacing="2.4">
+        <textPath href="#${uid}" startOffset="0%">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ • </textPath>
       </text>
     </g>
-    <!-- Inner sacred diamond & glowing core medallion -->
-    <polygon points="32,12 52,32 32,52 12,32" class="pg-diamond" />
-    <circle cx="32" cy="32" r="14" class="pg-core-disc" />
-    <text x="32" y="36" text-anchor="middle" class="pg-roman-numeral">${roman}</text>
+
+    <!-- Inner Clockwise Sacred Hexagram & Filigree Ring -->
+    <g>
+      <animateTransform attributeName="transform" type="rotate" from="360 50 50" to="0 50 50" dur="${isActive ? '12s' : '48s'}" repeatCount="indefinite" />
+      <polygon points="50,15 80,67 20,67" fill="none" stroke="${starStroke}" stroke-width="1.3" />
+      <polygon points="50,85 80,33 20,33" fill="none" stroke="${starStroke}" stroke-width="1.3" />
+      <circle cx="50" cy="50" r="26" fill="none" stroke="${outerStroke}" stroke-width="1.2" stroke-dasharray="6 3" />
+    </g>
+
+    <!-- Glowing Obsidian-Bifrost Core Medallion & Roman Page Numeral -->
+    <circle cx="50" cy="50" r="22" fill="url(#${uid}_core)" stroke="${innerStroke}" stroke-width="${isActive ? '2' : '1.3'}" />
+    <text x="50" y="56" text-anchor="middle" fill="${numFill}" font-family="Cinzel, Georgia, serif" font-size="17" font-weight="800">${roman}</text>
   `;
   return svg;
 }
