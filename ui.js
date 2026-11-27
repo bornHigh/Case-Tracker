@@ -105,7 +105,8 @@ function toArcaneRoman(num) {
 
 // Forge a miniature counter-rotating Runic Magic Circle SVG (Bifrost Cyan active, Engraved Gold dormant)
 function createRunicPageSeal(pageIndex, isActive) {
-  const svg = document.createElementNS('http://w3.org', 'svg');
+  const SVG_NS = 'http://' + 'www.w3.org' + '/2000/svg';
+  const svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('viewBox', '0 0 100 100');
   svg.setAttribute('class', 'rune-page-svg' + (isActive ? ' active' : ''));
   svg.setAttribute('aria-hidden', 'true');
