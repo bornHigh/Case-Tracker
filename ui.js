@@ -92,74 +92,98 @@ function getActiveLeafCanvas(railId) {
   return canvas;
 }
 
-function createHdLeafSvg(pageIndex) {
-  const palettes = [
-    ['#fef08a', '#d4af37', '#854d0e'], // Champagne Gold
-    ['#6ee7b7', '#10b981', '#065f46'], // Emerald
-    ['#7dd3fc', '#0ea5e9', '#075985'], // Arcane Cyan
-    ['#f9a8d4', '#ec4899', '#831843'], // Mystic Rose
-    ['#fde047', '#f59e0b', '#92400e']  // Amber Flame
-  ];
-  const [c1, c2, c3] = palettes[pageIndex % palettes.length];
-  const gradId = `leafGrad_${pageIndex}_${Math.random().toString(36).slice(2, 6)}`;
+// Convert 1-based page number to crisp Roman numerals for the Bifrost Grimoire rail
+function toArcaneRoman(num) {
+  const map = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+  let n = Math.max(1, num);
+  let out = '';
+  for (const [val, sym] of map) {
+    while (n >= val) { out += sym; n -= val; }
+  }
+  return out;
+}
 
+// Forge a miniature rotating Runic Seal SVG (Bifrost Cyan when active, Engraved Gold when dormant)
+function createRunicPageSeal(pageIndex, isActive) {
   const svg = document.createElementNS('http://w3.org', 'svg');
   svg.setAttribute('viewBox', '0 0 64 64');
-  svg.setAttribute('class', 'hd-leaf-svg');
+  svg.setAttribute('class', 'rune-page-svg' + (isActive ? ' active' : ''));
+  svg.setAttribute('aria-hidden', 'true');
+
+  const uid = `pgRune_${pageIndex}_${Math.random().toString(36).slice(2, 6)}`;
+  const roman = toArcaneRoman(pageIndex + 1);
 
   svg.innerHTML = `
     <defs>
-      <linearGradient id="${gradId}" x1="15%" y1="10%" x2="85%" y2="90%">
-        <stop offset="0%" stop-color="${c1}" />
-        <stop offset="55%" stop-color="${c2}" />
-        <stop offset="100%" stop-color="${c3}" />
-      </linearGradient>
+      <path id="${uid}" d="M 32,32 m -23,0 a 23,23 0 1,1 46,0 a 23,23 0 1,1 -46,0" />
     </defs>
-    <path d="M52 10 C32 10, 14 22, 12 44 C11 49, 13 52, 13 52 C13 52, 16 54, 21 53 C43 51, 54 32, 52 10 Z"
-          fill="url(#${gradId})" stroke="${c1}" stroke-width="1.4" stroke-linejoin="round" />
-    <path d="M10 54 C22 42, 36 28, 50 12" fill="none" stroke="#fffbeb" stroke-width="1.6" stroke-linecap="round" opacity="0.85" />
-    <path d="M24 40 L22 30 M32 32 L30 21 M40 24 L39 15 M28 36 L38 38 M36 28 L45 29"
-          fill="none" stroke="#fffbeb" stroke-width="1.1" stroke-linecap="round" opacity="0.6" />
+    <!-- Outer engraved filigree ring -->
+    <circle cx="32" cy="32" r="29" class="pg-ring-outer" />
+    <circle cx="32" cy="32" r="25" class="pg-ring-dash" />
+    <!-- Orbiting Elder Futhark runes -->
+    <g class="pg-rune-orbit">
+      <text class="pg-rune-glyphs">
+        <textPath href="#${uid}" startOffset="0%">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ </textPath>
+      </text>
+    </g>
+    <!-- Inner sacred diamond & glowing core medallion -->
+    <polygon points="32,12 52,32 32,52 12,32" class="pg-diamond" />
+    <circle cx="32" cy="32" r="14" class="pg-core-disc" />
+    <text x="32" y="36" text-anchor="middle" class="pg-roman-numeral">${roman}</text>
   `;
   return svg;
 }
 
+// Render the vertical Ethereal Bifrost Runic Paginator rail alongside each table
 function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   const rail = document.getElementById(railId);
   if (!rail) return;
+
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  while (rail.children.length > totalPages) rail.removeChild(rail.lastChild);
+  clearEl(rail);
 
-  const activeCanvas = getActiveLeafCanvas(railId);
+  // Helper to trigger a brief Bifrost light-sweep across the adjacent table on page turn
+  const triggerPageTurn = (targetPage) => {
+    if (targetPage === currentPage || targetPage < 0 || targetPage >= totalPages) return;
+    const wrap = rail.parentElement ? rail.parentElement.querySelector('.table-wrap') : null;
+    if (wrap) {
+      wrap.classList.remove('bifrost-page-flip');
+      void wrap.offsetWidth; // Force reflow so rapid page flips re-trigger animation
+      wrap.classList.add('bifrost-page-flip');
+    }
+    onSelect(targetPage);
+  };
 
+  // Top "Previous Page" Bifrost chevron button
+  const prevBtn = makeEl('button', 'rune-nav-btn', '▲');
+  prevBtn.type = 'button';
+  prevBtn.title = 'Previous Chronicle Page';
+  prevBtn.disabled = currentPage <= 0;
+  prevBtn.onclick = () => triggerPageTurn(currentPage - 1);
+  rail.appendChild(prevBtn);
+
+  // Vertical ley-line spine holding the glowing page rune seals
+  const spine = makeEl('div', 'rune-ley-spine');
   for (let p = 0; p < totalPages; p++) {
     const isActive = p === currentPage;
-    let leaf = rail.children[p];
-    if (!leaf) {
-      leaf = makeEl('button', 'leaf-btn');
-      leaf.type = 'button';
-      rail.appendChild(leaf);
-    }
-    leaf.className = 'leaf-btn' + (isActive ? ' active' : '');
-    leaf.onclick = () => { if (p !== currentPage) onSelect(p); };
-
-    if (isActive) {
-      if (!leaf.contains(activeCanvas)) {
-        clearEl(leaf);
-        leaf.appendChild(activeCanvas);
-        leaf.appendChild(createHdLeafSvg(p));
-      }
-      activeLeafPlayers[railId].start();
-    } else if (!leaf.querySelector('img.leaf-static')) {
-      clearEl(leaf);
-      const img = makeEl('img', 'leaf-video leaf-static');
-      img.alt = `Page ${p + 1}`;
-      if (cachedLeafPng) img.src = cachedLeafPng;
-      leaf.appendChild(img);
-      leaf.appendChild(createHdLeafSvg(p));
-    }
+    const nodeBtn = makeEl('button', 'leaf-btn' + (isActive ? ' active' : ''));
+    nodeBtn.type = 'button';
+    nodeBtn.title = `Page ${p + 1} of ${totalPages}`;
+    nodeBtn.onclick = () => triggerPageTurn(p);
+    nodeBtn.appendChild(createRunicPageSeal(p, isActive));
+    spine.appendChild(nodeBtn);
   }
+  rail.appendChild(spine);
+
+  // Bottom "Next Page" Bifrost chevron button
+  const nextBtn = makeEl('button', 'rune-nav-btn', '▼');
+  nextBtn.type = 'button';
+  nextBtn.title = 'Next Chronicle Page';
+  nextBtn.disabled = currentPage >= totalPages - 1;
+  nextBtn.onclick = () => triggerPageTurn(currentPage + 1);
+  rail.appendChild(nextBtn);
 }
+
 
 function makeMonthButton(t, activeId) {
   const btn = makeEl('button', 'month-btn' + (t.id === activeId ? ' active' : ''));
