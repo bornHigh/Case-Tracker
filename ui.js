@@ -192,8 +192,8 @@ function createRunicArrowSvg(direction, isDisabled) {
   return svg;
 }
 
-// Render the vertical Ethereal Bifrost Runic Paginator with a capped 3-seal sliding window
-function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
+// Render the vertical Ethereal Bifrost Runic Paginator with a configurable sliding seal window
+function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect, maxVisible = 3) {
   const rail = document.getElementById(railId);
   if (!rail) return;
 
@@ -222,7 +222,6 @@ function renderLeafRail(railId, totalItems, pageSize, currentPage, onSelect) {
   rail.appendChild(prevBtn);
 
   // Sliding 3-seal window so 100+ cases / 20+ monits never stretch the rail past the table height
-  const maxVisible = 3;
   let winStart = Math.max(0, currentPage - 1);
   let winEnd = Math.min(totalPages, winStart + maxVisible);
   if (winEnd - winStart < maxVisible) {
@@ -574,9 +573,10 @@ function renderQaTable(tab) {
   const totalPages = Math.max(1, Math.ceil(tab.qaAudits.length / QA_PAGE_SIZE));
   if (qaPage >= totalPages) qaPage = totalPages - 1;
 
+    // Cap QA Monit paginator to 1 active Runic Seal so the compact 4-row panel never overflows
   renderLeafRail('qaLeafRail', tab.qaAudits.length, QA_PAGE_SIZE, qaPage, p => {
     qaPage = p; editingQaIdx = null; render();
-  });
+  }, 1);
 
   const qaBody = document.getElementById('qaTableBody');
   clearEl(qaBody);
