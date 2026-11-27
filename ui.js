@@ -319,8 +319,8 @@ function renderSidebarAndCards(tab, m) {
   document.getElementById('submitQaBtn').disabled = tab.archived;
   document.getElementById('archiveBtn').disabled = tab.archived;
 
-  const cardsData = {
-        bonus: {
+    const cardsData = {
+    bonus: {
       title: 'Real-Time Bonus Payout',
       value: `€${m.totalBonus}`,
       sub: m.forfeited
@@ -328,13 +328,34 @@ function renderSidebarAndCards(tab, m) {
         : m.penalty > 0
           ? `${[m.ahtPenalty ? '-€50 AHT' : '', m.rrPenalty ? '-€25 RR' : ''].filter(Boolean).join(' & ')} | RR: ${m.rrPct !== null ? m.rrPct.toFixed(0) + '%' : 'Void'}`
           : `RR: ${m.rrPct !== null ? m.rrPct.toFixed(0) + '%' : 'Void'} • Max: €300`,
-      color: m.forfeited ? 'txt-red' : 'txt-green'
+      // Ignites Crimson Doom aura if forfeited or any penalty (-€50 AHT / -€25 RR) is active
+      color: (m.forfeited || m.penalty > 0) ? 'txt-red' : 'txt-green'
     },
-
-    csat: { title: 'CSAT Score', value: m.csatPct !== null ? `${m.csatPct.toFixed(1)}%` : '—', sub: `Bonus: +€${m.csatBonus} (Target 94%+)`, color: m.csatPct === null ? '' : m.csatPct >= 94 ? 'txt-green' : m.csatPct < 75 ? 'txt-red' : 'txt-amber' },
-    aht: { title: 'Average AHT', value: m.avgAht !== null ? `${m.avgAht.toFixed(1)}m` : '—', sub: m.avgAht !== null && m.avgAht > 32 ? 'Over 32m (-€50)' : 'Limit: 32.0 mins max', color: m.avgAht !== null && m.avgAht > 32 ? 'txt-red' : 'txt-sky' },
-    quality: { title: 'Quality Score (QA)', value: m.avgQual !== null ? `${m.avgQual.toFixed(1)}%` : '—', sub: `Bonus: +€${m.qualBonus} (${tab.qaAudits.length} monits)`, color: m.avgQual !== null && m.avgQual >= 90 ? 'txt-green' : '' },
-    crt: { title: 'CRT NE Rate', value: m.crtPct !== null ? `${m.crtPct.toFixed(1)}%` : '—', sub: `Bonus: +€${m.crtBonus} (Target 94%+)`, color: m.crtPct !== null && m.crtPct >= 94 ? 'txt-green' : '' }
+    // Every KPI orb turns Crimson ('txt-red') whenever logged and off-target
+    csat: {
+      title: 'CSAT Score',
+      value: m.csatPct !== null ? `${m.csatPct.toFixed(1)}%` : '—',
+      sub: `Bonus: +€${m.csatBonus} (Target 94%+)`,
+      color: m.csatPct === null ? '' : m.csatPct >= 94 ? 'txt-green' : 'txt-red'
+    },
+    aht: {
+      title: 'Average AHT',
+      value: m.avgAht !== null ? `${m.avgAht.toFixed(1)}m` : '—',
+      sub: m.avgAht !== null && m.avgAht > 32 ? 'Over 32m (-€50)' : 'Limit: 32.0 mins max',
+      color: m.avgAht === null ? 'txt-sky' : m.avgAht > 32 ? 'txt-red' : 'txt-green'
+    },
+    quality: {
+      title: 'Quality Score (QA)',
+      value: m.avgQual !== null ? `${m.avgQual.toFixed(1)}%` : '—',
+      sub: `Bonus: +€${m.qualBonus} (${tab.qaAudits.length} monits)`,
+      color: m.avgQual === null ? '' : m.avgQual >= 90 ? 'txt-green' : 'txt-red'
+    },
+    crt: {
+      title: 'CRT NE Rate',
+      value: m.crtPct !== null ? `${m.crtPct.toFixed(1)}%` : '—',
+      sub: `Bonus: +€${m.crtBonus} (Target 94%+)`,
+      color: m.crtPct === null ? '' : m.crtPct >= 94 ? 'txt-green' : 'txt-red'
+    }
   };
 
     // Short archaic labels for the 5 circular KPI Runic Medallions
