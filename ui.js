@@ -472,76 +472,86 @@ function renderSidebarAndCards(tab, m) {
 
     kpiGrid.appendChild(card);
 
-        // Forge organic astral mist ribbons & drifting fairy wisps in each gap between KPI orbs
+      // Forge vibrant woven astral mist ribbons, twinkling fairy stars & glowing fireflies between KPI orbs
     if (idx < state.kpiOrder.length - 1) {
       const nextCard = cardsData[state.kpiOrder[idx + 1]];
       const isDoom = c.color === 'txt-red' || nextCard.color === 'txt-red';
       const isBounty = !isDoom && (c.color === 'txt-green' && nextCard.color === 'txt-green');
       const stateClass = isDoom ? 'conduit-doom' : isBounty ? 'conduit-bounty' : 'conduit-cyan';
 
-      const wispCore  = isDoom ? '#fecdd3' : isBounty ? '#fef9c3' : '#e0f2fe';
-      const wispGlow  = isDoom ? '#fb7185' : isBounty ? '#34d399' : '#38bdf8';
-      const mistTone  = isDoom ? '#f43f5e' : isBounty ? '#fbbf24' : '#7dd3fc';
+      const wispCore  = isDoom ? '#fff1f2' : isBounty ? '#fefce8' : '#f0f9ff';
+      const wispGlow  = isDoom ? '#fb7185' : isBounty ? '#10b981' : '#38bdf8';
+      const mistTone  = isDoom ? '#f43f5e' : isBounty ? '#fbbf24' : '#818cf8';
       const fId       = `wispGlow_${idx}_${Math.random().toString(36).slice(2, 6)}`;
 
       const bridge = makeEl('div', `kpi-conduit ${stateClass}`);
       bridge.setAttribute('aria-hidden', 'true');
 
       const bSvg = document.createElementNS(SVG_NS, 'svg');
-      bSvg.setAttribute('viewBox', '0 0 120 72');
+      bSvg.setAttribute('viewBox', '0 0 120 76');
       bSvg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
       bSvg.setAttribute('class', 'conduit-svg');
       bSvg.innerHTML = `
         <defs>
-          <!-- Soft multi-stage Gaussian bloom for true fairy-light diffusion -->
-          <filter id="${fId}" x="-60%" y="-60%" width="220%" height="220%">
-            <feGaussianBlur stdDeviation="3.2" result="blurSoft" />
-            <feGaussianBlur stdDeviation="1.1" result="blurCore" />
+          <!-- Rich multi-stage fairy bloom so ribbons and sparks pop cleanly over any wallpaper -->
+          <filter id="${fId}" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="4.5" result="blurWide" />
+            <feGaussianBlur stdDeviation="1.6" result="blurTight" />
             <feMerge>
-              <feMergeNode in="blurSoft" />
-              <feMergeNode in="blurCore" />
+              <feMergeNode in="blurWide" />
+              <feMergeNode in="blurTight" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          <path id="${fId}_wave1" d="M 8,40 C 36,16 84,56 112,32" />
-          <path id="${fId}_wave2" d="M 10,30 C 42,54 78,18 110,42" />
+          <path id="${fId}_wave1" d="M 4,42 C 34,12 86,62 116,32" />
+          <path id="${fId}_wave2" d="M 6,28 C 40,60 80,14 114,46" />
         </defs>
 
-        <!-- Ethereal woven astral mist ribbons (no rigid straight lines) -->
-        <use href="#${fId}_wave1" fill="none" stroke="${wispGlow}" stroke-width="2.4" stroke-opacity="0.24" filter="url(#${fId})" />
-        <use href="#${fId}_wave2" fill="none" stroke="${mistTone}" stroke-width="1.6" stroke-opacity="0.22" filter="url(#${fId})" />
+        <!-- Vivid woven astral aurora ribbons -->
+        <use href="#${fId}_wave1" fill="none" stroke="${wispGlow}" stroke-width="3.6" stroke-opacity="0.52" stroke-linecap="round" filter="url(#${fId})" />
+        <use href="#${fId}_wave2" fill="none" stroke="${mistTone}" stroke-width="2.6" stroke-opacity="0.45" stroke-linecap="round" filter="url(#${fId})" />
 
-        <!-- Drifting Fairy Fireflies / Smoldering Embers gliding along organic curves -->
+        <!-- Flowing starlight shimmer thread gliding along the primary wave -->
+        <use href="#${fId}_wave1" fill="none" stroke="${wispCore}" stroke-width="1.5" stroke-opacity="0.78"
+             stroke-dasharray="14 26" stroke-linecap="round" filter="url(#${fId})">
+          <animate attributeName="stroke-dashoffset" from="${isDoom ? '0' : '80'}" to="${isDoom ? '80' : '0'}"
+                   dur="${isDoom ? '1.8s' : '3.2s'}" repeatCount="indefinite" />
+        </use>
+
+        <!-- Glowing Fairy Fireflies with soft outer aura halos -->
         <g filter="url(#${fId})">
-          <circle r="2.6" fill="${wispCore}">
-            <animateMotion dur="${isDoom ? '3.4s' : '5.2s'}" repeatCount="indefinite">
+          <!-- Primary fairy orb -->
+          <g>
+            <animateMotion dur="${isDoom ? '3.2s' : '4.8s'}" repeatCount="indefinite">
               <mpath href="#${fId}_wave1" />
             </animateMotion>
-            <animate attributeName="opacity" values="0;0.95;0.85;0" dur="${isDoom ? '3.4s' : '5.2s'}" repeatCount="indefinite" />
-          </circle>
+            <circle r="6.5" fill="${wispGlow}" opacity="0.38" />
+            <circle r="3.2" fill="${wispCore}">
+              <animate attributeName="opacity" values="0.15;1;0.9;0.15" dur="${isDoom ? '3.2s' : '4.8s'}" repeatCount="indefinite" />
+            </circle>
+          </g>
 
-          <circle r="1.9" fill="${mistTone}">
-            <animateMotion dur="${isDoom ? '4.1s' : '6.4s'}" begin="1.4s" repeatCount="indefinite">
+          <!-- Counter-drifting secondary wisp -->
+          <g>
+            <animateMotion dur="${isDoom ? '3.9s' : '5.8s'}" begin="1.3s" repeatCount="indefinite">
               <mpath href="#${fId}_wave2" />
             </animateMotion>
-            <animate attributeName="opacity" values="0;0.9;0.75;0" dur="${isDoom ? '4.1s' : '6.4s'}" begin="1.4s" repeatCount="indefinite" />
-          </circle>
+            <circle r="5.5" fill="${mistTone}" opacity="0.35" />
+            <circle r="2.6" fill="${wispCore}">
+              <animate attributeName="opacity" values="0.15;0.95;0.85;0.15" dur="${isDoom ? '3.9s' : '5.8s'}" begin="1.3s" repeatCount="indefinite" />
+            </circle>
+          </g>
 
-          <circle r="2.2" fill="${wispCore}">
-            <animateMotion dur="${isDoom ? '3.8s' : '5.8s'}" begin="2.7s" repeatCount="indefinite">
-              <mpath href="#${fId}_wave1" />
-            </animateMotion>
-            <animate attributeName="opacity" values="0;0.85;0.9;0" dur="${isDoom ? '3.8s' : '5.8s'}" begin="2.7s" repeatCount="indefinite" />
-          </circle>
-
-          <!-- Ambient floating fairy dust motes bobbing softly in mid-air -->
-          <circle cx="44" cy="24" r="1.5" fill="${wispCore}">
-            <animate attributeName="cy" values="26;19;26" dur="4.2s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.15;0.85;0.15" dur="4.2s" repeatCount="indefinite" />
-          </circle>
-          <circle cx="76" cy="46" r="1.7" fill="${mistTone}">
-            <animate attributeName="cy" values="48;40;48" dur="4.8s" begin="1.1s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.2;0.9;0.2" dur="4.8s" begin="1.1s" repeatCount="indefinite" />
+          <!-- Twinkling 4-point fairy star sparkles floating in the open sky -->
+          <path d="M 38,15 L 39.5,19.5 L 44,21 L 39.5,22.5 L 38,27 L 36.5,22.5 L 32,21 L 36.5,19.5 Z" fill="${wispCore}">
+            <animate attributeName="opacity" values="0.2;1;0.2" dur="2.6s" repeatCount="indefinite" />
+          </path>
+          <path d="M 82,49 L 83.2,52.8 L 87,54 L 83.2,55.2 L 82,59 L 80.8,55.2 L 77,54 L 80.8,52.8 Z" fill="${mistTone}">
+            <animate attributeName="opacity" values="0.25;0.95;0.25" dur="3.1s" begin="1.1s" repeatCount="indefinite" />
+          </path>
+          <circle cx="60" cy="36" r="2.2" fill="${wispCore}">
+            <animate attributeName="cy" values="39;31;39" dur="3.6s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="3.6s" repeatCount="indefinite" />
           </circle>
         </g>
       `;
