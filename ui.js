@@ -418,7 +418,7 @@ function renderSidebarAndCards(tab, m) {
   const kpiGrid = document.getElementById('kpiGrid');
   clearEl(kpiGrid);
 
-  state.kpiOrder.forEach(key => {
+    state.kpiOrder.forEach((key, idx) => {
     const c = cardsData[key];
     const pal = auraPalettes[c.color] || auraPalettes.default;
     const uid = `kpiOrb_${key}_${Math.random().toString(36).slice(2, 6)}`;
@@ -471,6 +471,45 @@ function renderSidebarAndCards(tab, m) {
     card.appendChild(core);
 
     kpiGrid.appendChild(card);
+
+    // Forge a live color-reactive Ley-Line Conduit & Diamond Rune Relay in each gap between orbs
+    if (idx < state.kpiOrder.length - 1) {
+      const nextCard = cardsData[state.kpiOrder[idx + 1]];
+      const isDoom = c.color === 'txt-red' || nextCard.color === 'txt-red';
+      const isBounty = !isDoom && (c.color === 'txt-green' && nextCard.color === 'txt-green');
+      const stateClass = isDoom ? 'conduit-doom' : isBounty ? 'conduit-bounty' : 'conduit-cyan';
+
+      const streamColor = isDoom ? '#ef4444' : isBounty ? '#10b981' : '#38bdf8';
+      const accentColor = isDoom ? '#fca5a5' : isBounty ? '#fbbf24' : '#a5f3fc';
+
+      const bridge = makeEl('div', `kpi-conduit ${stateClass}`);
+      bridge.setAttribute('aria-hidden', 'true');
+
+      const bSvg = document.createElementNS(SVG_NS, 'svg');
+      bSvg.setAttribute('viewBox', '0 0 120 36');
+      bSvg.setAttribute('preserveAspectRatio', 'none');
+      bSvg.setAttribute('class', 'conduit-svg');
+      bSvg.innerHTML = `
+        <!-- Dual flanking ley-line energy beams -->
+        <line x1="0" y1="18" x2="48" y2="18" stroke="${streamColor}" stroke-width="1.5" stroke-opacity="0.55" />
+        <line x1="72" y1="18" x2="120" y2="18" stroke="${streamColor}" stroke-width="1.5" stroke-opacity="0.55" />
+        <!-- Traveling mana sparks / crackling crimson energy pulses -->
+        <line x1="0" y1="18" x2="120" y2="18" stroke="${accentColor}" stroke-width="2"
+              stroke-dasharray="${isDoom ? '5 7 2 9' : '8 14'}" stroke-linecap="round">
+          <animate attributeName="stroke-dashoffset" from="${isDoom ? '0' : '44'}" to="${isDoom ? '46' : '0'}"
+                   dur="${isDoom ? '0.9s' : '2.2s'}" repeatCount="indefinite" />
+        </line>
+        <!-- Central rotating diamond rune relay node -->
+        <g>
+          <animateTransform attributeName="transform" type="rotate" from="0 60 18" to="360 60 18"
+                            dur="${isDoom ? '6s' : '14s'}" repeatCount="indefinite" />
+          <polygon points="60,7 71,18 60,29 49,18" fill="rgba(9, 13, 26, 0.92)" stroke="${accentColor}" stroke-width="1.4" />
+        </g>
+        <circle cx="60" cy="18" r="2.6" fill="${accentColor}" />
+      `;
+      bridge.appendChild(bSvg);
+      kpiGrid.appendChild(bridge);
+    }
   });
 }
 
