@@ -576,7 +576,7 @@ function renderQaTable(tab) {
     // Cap QA Monit paginator to 1 active Runic Seal so the compact 4-row panel never overflows
   renderLeafRail('qaLeafRail', tab.qaAudits.length, QA_PAGE_SIZE, qaPage, p => {
     qaPage = p; editingQaIdx = null; render();
-  }, 1);
+  }, 2);
 
   const qaBody = document.getElementById('qaTableBody');
   clearEl(qaBody);
