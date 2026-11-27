@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CaseFlow Arcane — Case Tracker, QA Monit &amp; €300 Bonus Engine</title>
+  <!-- Load Cinzel and Plus Jakarta Sans fonts for arcane headings and readable interface text -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Main stylesheet for CaseFlow Arcane -->
+  <link rel="stylesheet" href="spellbook.css?v=43" />
+</head>
+<body>
+
+  <!-- Background wallpaper media and tint layer -->
+  <div id="wallpaperLayer" class="wallpaper-layer">
+    <video id="bgVideo" autoplay loop muted playsinline class="hidden"></video>
+    <img id="bgImage" alt="" class="hidden" />
+    <div class="wallpaper-overlay"></div>
+  </div>
+
+  <!-- Top bar with app title and main actions -->
+  <header>
+    <div class="brand">
+      <div class="brand-logo">✦</div>
+      <div>
+        <h1 class="fancy-title">CaseFlow Arcane</h1>
+        <p>Case Tracker, QA Monit &amp; Real-Time €300 Bonus Engine</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-secondary" id="wallpaperBtn">✦ Wallpaper</button>
+      <button type="button" class="btn-secondary" id="exportBtn">Export CSV</button>
+      <button type="button" class="btn-primary" id="archiveBtn">Archive &amp; Start New Month</button>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <!-- Left sidebar for monthly tabs, Oracle scroll, and bonus rules -->
+    <aside>
+      <div class="sidebar-top">
+        <div class="sidebar-label">✦ Active Chronicle</div>
+        <div id="activeMonthSlot" class="month-list"></div>
+
+        <!-- Expandable list of archived months -->
+        <button type="button" class="archive-toggle-btn" id="toggleArchivesBtn">
+          <span>Archived Chronicles (<span id="archiveCount">0</span>)</span>
+          <span id="archiveArrow">▸</span>
+        </button>
+        <div id="archivedMonthsList" class="month-list scrollable-months collapsed"></div>
+      </div>
+
+      <!-- Oracle scroll area centered between Archived Chronicles and €300 Arcane Addendum -->
+      <div id="arcaneOracleCard" class="arcane-oracle-card">
+        <div id="oracleDisplay" class="oracle-display"></div>
+      </div>
+
+      <!-- Reference summary of the bonus thresholds, penalties, and forfeiture rule -->
+      <div class="rules-box">
+        <h4 class="fancy-title">❧ €300 Arcane Addendum ❧</h4>
+        <div>CSAT ≥94%: <span class="txt-green">+€180</span> | ≥89%: <span class="txt-green">+€100</span></div>
+        <div>CSAT &lt;75%: <span class="txt-red">Forfeits All (€0)</span></div>
+        <div>CRT NE ≥94%: <span class="txt-green">+€80</span></div>
+        <div>SQS ≥90%: <span class="txt-green">+€40</span></div>
+        <div>RR &lt;84%: <span class="txt-amber">-€25</span> | AHT &gt;32m: <span class="txt-amber">-€50</span></div>
+      </div>
+    </aside>
+
+    <!-- Main workspace for period dates, KPI orbs, forms, and tables -->
+    <main>
+      <div id="archivedBanner" class="archived-banner">
+        <span><strong>Archived Chronicle (Read-Only):</strong> Case history, QA monit, and date range are sealed.</span>
+        <button type="button" class="btn-secondary" id="returnActiveBtn">Return to Active Month</button>
+      </div>
+
+      <!-- Active period label and editable start/end dates -->
+      <div class="period-bar">
+        <div class="period-info">
+          <span class="sidebar-label" style="margin:0;">✦ Active Period:</span>
+          <strong id="periodTitle" class="fancy-title" style="color:#fff; font-size:15px;"></strong>
+        </div>
+        <div class="period-inputs">
+          <label style="margin:0; font-size:11px;">From</label>
+          <input type="date" id="startDateInput" />
+          <label style="margin:0; font-size:11px;">To</label>
+          <input type="date" id="endDateInput" />
+        </div>
+      </div>
+
+      <!-- KPI orbs section supporting drag-and-drop reordering -->
+      <section>
+        <div class="section-header">
+          <h2>✦ Real-Time KPI &amp; €300 Bonus Tracker (Drag Cards to Reorder)</h2>
+          <button type="button" class="btn-secondary btn-xs" id="resetLayoutBtn">Reset Layout</button>
+        </div>
+        <div id="kpiGrid" class="kpi-grid"></div>
+      </section>
+
+      <!-- Reorderable workspace columns for entry forms and data tables -->
+      <section id="panelsContainer" class="panels-grid">
+
+        <div id="panel-forms" draggable="true" class="stack-col workspace-panel">
+          <!-- Form for logging new support cases -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3><span class="grip">⋮⋮</span> Log Case Entry</h3>
+              <span id="activeMonthBadge" class="pill"></span>
+            </div>
+
+            <form id="caseForm">
+              <div class="form-row form-group">
+                <div>
+                  <label>Case ID / Ticket #</label>
+                  <input type="text" id="caseId" required placeholder="e.g. CASE-4092" />
+                </div>
+                <div>
+                  <label>Client Name</label>
+                  <input type="text" id="clientNameInput" required placeholder="e.g. Acme Corp" />
+                </div>
+              </div>
+
+              <div class="form-row form-group">
+                <div>
+                  <label>AHT (Minutes)</label>
+                  <input type="number" step="0.1" min="0" id="ahtInput" required placeholder="e.g. 24.5" />
+                </div>
+                <div>
+                  <label>CSAT Outcome</label>
+                  <select id="csatInput">
+                    <option value="Bounty">Bounty</option>
+                    <option value="Doomed">Doomed</option>
+                    <option value="Void">Void</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row form-group">
+                <div>
+                  <label>CRT NE</label>
+                  <select id="crtInput">
+                    <option value="Bounty">Bounty</option>
+                    <option value="Doomed">Doomed</option>
+                    <option value="Void">Void</option>
+                  </select>
+                </div>
+                <div>
+                  <label>RR (30 Min)</label>
+                  <select id="rrInput">
+                    <option value="Bounty">Bounty</option>
+                    <option value="Doomed">Doomed</option>
+                    <option value="Void">Void</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" id="submitCaseBtn" class="btn-primary btn-full">
+                + Add Case to Tracker
+              </button>
+            </form>
+          </div>
+
+          <!-- Form for logging quality assurance audits -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3>✦ Log QA Monit</h3>
+              <span id="qaAvgPill" class="pill">Avg: —</span>
+            </div>
+
+            <form id="qaForm">
+              <div class="form-group">
+                <label>Case ID</label>
+                <input type="text" id="qaCaseId" required placeholder="e.g. CASE-4092" />
+              </div>
+
+              <div class="form-row form-group">
+                <div>
+                  <label>Monit Provided By</label>
+                  <input type="text" id="qaAuditorInput" required placeholder="Auditor name" />
+                </div>
+                <div>
+                  <label>QA Score (%)</label>
+                  <input type="number" step="0.1" min="0" max="100" id="qaScoreInput" required placeholder="e.g. 95" />
+                </div>
+              </div>
+
+              <button type="submit" id="submitQaBtn" class="btn-secondary btn-full">
+                + Add QA Monit
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div id="panel-tables" draggable="true" class="stack-col workspace-panel">
+
+          <!-- Paginated case tracker table with search and runic page rail -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3 class="fancy-title"><span class="grip">⋮⋮</span> ❧ Case Tracker</h3>
+              <div class="search-box">
+                <input type="text" id="caseSearchInput" placeholder="Search Case ID or Client..." />
+                <button type="button" class="btn-primary btn-xs" id="caseSearchBtn">🔍</button>
+              </div>
+            </div>
+
+            <div class="paged-layout">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Case ID</th>
+                      <th>Client</th>
+                      <th>AHT</th>
+                      <th>CSAT</th>
+                      <th>CRT NE</th>
+                      <th>RR</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="caseTableBody"></tbody>
+                </table>
+              </div>
+              <div id="caseLeafRail" class="leaf-rail"></div>
+            </div>
+          </div>
+
+          <!-- Paginated QA monit table with runic page rail -->
+          <div class="panel">
+            <div class="panel-header">
+              <h3 class="fancy-title">✦ QA Monit</h3>
+              <span id="qaCountLabel" class="muted-text">0 monits logged</span>
+            </div>
+
+            <div class="paged-layout">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Case ID</th>
+                      <th>Monit Provided By</th>
+                      <th>Score</th>
+                      <th class="text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="qaTableBody"></tbody>
+                </table>
+              </div>
+              <div id="qaLeafRail" class="leaf-rail"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal showing matching case search results -->
+  <div id="searchModal" class="modal-backdrop hidden">
+    <div class="modal-3d-card">
+      <div class="panel-header">
+        <h3 class="fancy-title">✦ Case Chronicle Lookup</h3>
+        <button type="button" class="btn-icon" id="closeSearchModalBtn">✕</button>
+      </div>
+      <div id="searchResultsBody" class="search-results-list"></div>
+    </div>
+  </div>
+
+  <!-- Modal for choosing or resetting wallpapers listed in wallpapers/list.json -->
+  <div id="wallpaperModal" class="modal-backdrop hidden">
+    <div class="modal-3d-card" style="max-width: 560px;">
+      <div class="panel-header">
+        <h3 class="fancy-title">✦ Realm Wallpaper Studio</h3>
+        <button type="button" class="btn-icon" id="closeWallpaperModalBtn">✕</button>
+      </div>
+
+      <p class="muted-text" style="margin-bottom: 10px;">
+        Showing photos &amp; looping videos from your <strong>wallpapers/</strong> folder in GitHub:
+      </p>
+
+      <div id="repoWallpaperGrid" class="wp-gallery-grid">
+        <p class="muted-text">Loading wallpapers from GitHub...</p>
+      </div>
+
+      <div class="header-actions" style="justify-content: space-between; margin-top: 14px;">
+        <button type="button" class="btn-secondary btn-xs" id="refreshWallpapersBtn">↻ Refresh List</button>
+        <button type="button" class="btn-secondary" id="clearWallpaperBtn">Reset Default Theme</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation modal before permanently deleting an archived month -->
+  <div id="banishModal" class="modal-backdrop hidden">
+    <div class="runic-circle-modal">
+      <!-- Rotating runic rings behind the confirmation prompt -->
+      <svg class="runic-ring-svg" viewBox="0 0 360 360" aria-hidden="true">
+        <defs>
+          <path id="outerRunePath" d="M 180,180 m -162,0 a 162,162 0 1,1 324,0 a 162,162 0 1,1 -324,0" />
+          <path id="innerRunePath" d="M 180,180 m -134,0 a 134,134 0 1,1 268,0 a 134,134 0 1,1 -268,0" />
+        </defs>
+        <g class="rune-spin-cw">
+          <circle cx="180" cy="180" r="172" class="rune-stroke-gold" />
+          <circle cx="180" cy="180" r="150" class="rune-stroke-dash" />
+          <text class="rune-glyphs">
+            <textPath href="#outerRunePath" startOffset="0%">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ • </textPath>
+          </text>
+        </g>
+        <g class="rune-spin-ccw">
+          <circle cx="180" cy="180" r="142" class="rune-stroke-crimson" />
+          <polygon points="180,44 298,248 62,248" class="rune-sigil-poly" />
+          <polygon points="180,316 298,112 62,112" class="rune-sigil-poly" />
+          <text class="rune-glyphs-inner">
+            <textPath href="#innerRunePath" startOffset="0%">✦ ARCANE SEAL ✦ BANISHMENT RITE ✦ VOID ETERNAL </textPath>
+          </text>
+        </g>
+      </svg>
+
+      <!-- Confirmation text and Banish / Spare buttons -->
+      <div class="runic-core-content">
+        <div class="runic-eyebrow">❧ RITE OF BANISHMENT ❧</div>
+        <h3 class="fancy-title runic-title">Seal Into The Void?</h3>
+        <p class="runic-msg">Banish archived chronicle <strong id="banishTargetName">"—"</strong> forever?</p>
+        <div class="runic-actions">
+          <button type="button" id="confirmBanishBtn" class="btn-banish">Banish</button>
+          <button type="button" id="cancelBanishBtn" class="btn-spare">Spare</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden SVG turbulence filter used for subtle visual distortion -->
+  <svg width="0" height="0" style="position:absolute; pointer-events:none;">
+    <defs>
+      <filter id="arcaneSmokeFlow" x="-40%" y="-60%" width="180%" height="200%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.035 0.08" numOctaves="3" seed="2" result="noise">
+          <animate attributeName="baseFrequency" dur="7s" values="0.035 0.08;0.045 0.11;0.035 0.08" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="5.5" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- Scripts load in strict dependency order: arcane-core.js, then oracle.js, then grimoire.js -->
+  <script src="arcane-core.js?v=19"></script>
+  <script src="oracle.js?v=6"></script>
+  <script src="grimoire.js?v=44"></script>
+</body>
+</html>
