@@ -385,24 +385,78 @@ main {
 
 .paged-layout { display: flex; align-items: flex-start; gap: 12px; }
 
-/* Right-Hand Pagination Rail Aligned with First Data Row (Below Table Header) */
+/* =========================================================
+   Ethereal God of War Bifrost Runic Paginator Rail
+   ========================================================= */
 .leaf-rail {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
   gap: 6px;
-  padding: 34px 2px 6px 8px;
-  border-left: 1px solid rgba(167, 139, 250, 0.22);
+  padding: 28px 2px 6px 8px;
+  border-left: 1px solid rgba(56, 189, 248, 0.22);
   flex-shrink: 0;
-  width: 58px;
+  width: 56px;
 }
 
-/* Pagination Leaf Button Container */
+/* Top & Bottom Bifrost Page-Turn Chevrons */
+.rune-nav-btn {
+  width: 28px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: rgba(15, 23, 42, 0.85);
+  color: #7dd3fc;
+  font-size: 9px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.14);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.rune-nav-btn:hover:not(:disabled) {
+  color: #e0f2fe;
+  border-color: #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
+  transform: translateY(-1px);
+}
+.rune-nav-btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Glowing vertical Bifrost ley-line thread connecting page seals */
+.rune-ley-spine {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+}
+.rune-ley-spine::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 50%;
+  width: 1.5px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.2), rgba(56, 189, 248, 0.55), rgba(251, 191, 36, 0.2));
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+  pointer-events: none;
+}
+
+/* Individual Runic Page Seal Button */
 .leaf-btn {
   position: relative;
-  width: 50px;
-  height: 50px;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
   padding: 0;
   background: transparent !important;
   border: none !important;
@@ -410,34 +464,60 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: transform 0.22s ease;
+}
+.leaf-btn:hover:not(.active) { transform: scale(1.08); }
+.leaf-btn.active { transform: scale(1.14); }
+
+/* SVG Runic Seal Geometry & Colors */
+.rune-page-svg {
+  width: 44px;
+  height: 44px;
   overflow: visible;
-  mix-blend-mode: lighten;
-  transition: transform 0.25s ease;
-}
-
-/* Sharp HD Video Leaf with Pitch-Black Background Stripped */
-.leaf-video {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
   pointer-events: none;
-  mix-blend-mode: screen;
-  filter: brightness(0.88) contrast(1.42) saturate(1.18);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.8));
+  transition: filter 0.25s ease;
+}
+.rune-page-svg.active {
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.75)) drop-shadow(0 0 16px rgba(129, 140, 248, 0.45));
 }
 
-/* Distinct Jewel Hue Shifts for Pages 2-5 (Page 1 Keeps Exact Violet & Gold) */
-.leaf-btn:nth-child(5n+2) .leaf-video { filter: hue-rotate(55deg) brightness(0.88) contrast(1.42) saturate(1.22); }
-.leaf-btn:nth-child(5n+3) .leaf-video { filter: hue-rotate(140deg) brightness(0.88) contrast(1.42) saturate(1.22); }
-.leaf-btn:nth-child(5n+4) .leaf-video { filter: hue-rotate(215deg) brightness(0.88) contrast(1.42) saturate(1.22); }
-.leaf-btn:nth-child(5n+5) .leaf-video { filter: hue-rotate(290deg) brightness(0.88) contrast(1.42) saturate(1.22); }
+.pg-ring-outer { fill: none; stroke: rgba(251, 191, 36, 0.32); stroke-width: 1.2; }
+.rune-page-svg.active .pg-ring-outer { stroke: rgba(56, 189, 248, 0.85); stroke-width: 1.5; }
 
-.leaf-btn:hover:not(.active) {
-  transform: scale(1.08);
+.pg-ring-dash { fill: none; stroke: rgba(148, 163, 184, 0.25); stroke-width: 1; stroke-dasharray: 3 4; }
+.rune-page-svg.active .pg-ring-dash { stroke: rgba(125, 211, 252, 0.65); }
+
+.pg-rune-orbit { transform-origin: 32px 32px; }
+.rune-page-svg.active .pg-rune-orbit { animation: runeRotateCW 18s linear infinite; }
+
+.pg-rune-glyphs { fill: rgba(251, 191, 36, 0.42); font-size: 5.2px; letter-spacing: 1.1px; }
+.rune-page-svg.active .pg-rune-glyphs { fill: #bae6fd; }
+
+.pg-diamond { fill: rgba(15, 23, 42, 0.85); stroke: rgba(251, 191, 36, 0.35); stroke-width: 1; }
+.rune-page-svg.active .pg-diamond { fill: rgba(14, 116, 144, 0.38); stroke: #38bdf8; }
+
+.pg-core-disc { fill: #0b1120; stroke: rgba(148, 163, 184, 0.35); stroke-width: 1.1; }
+.rune-page-svg.active .pg-core-disc { fill: #082f49; stroke: #7dd3fc; stroke-width: 1.4; }
+
+.pg-roman-numeral {
+  fill: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: 'Cinzel', Georgia, serif;
+}
+.rune-page-svg.active .pg-roman-numeral { fill: #f0f9ff; }
+
+/* Brief Bifrost light-sweep across table rows when turning a page */
+.table-wrap.bifrost-page-flip {
+  animation: bifrostSweep 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes bifrostSweep {
+  0% { opacity: 0.45; transform: translateY(5px); filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.45)); }
+  100% { opacity: 1; transform: translateY(0); filter: none; }
 }
 
-.leaf-btn.active {
-  transform: scale(1.14);
-}
 
 
 .form-group { margin-bottom: 12px; }
