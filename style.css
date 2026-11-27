@@ -85,8 +85,9 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .app-shell { display: flex; flex: 1; height: calc(100vh - 69px); }
 
-/* Make sidebar shell transparent so inner cards float cleanly over the wallpaper */
+/* Anchor sidebar so the floating archive drawer overlays without shifting the scroll or rules card */
 aside {
+  position: relative;
   width: 265px;
   background: transparent;
   backdrop-filter: none;
@@ -99,8 +100,20 @@ aside {
   flex-shrink: 0;
 }
 
-/* Remove flex: 1 so the scroll floats dead-center in the open sidebar sky */
-.sidebar-top { display: flex; flex-direction: column; min-height: 0; flex-shrink: 0; }
+/* Keep top controls sharp above the blurred lower sidebar */
+.sidebar-top { position: relative; z-index: 25; display: flex; flex-direction: column; min-height: 0; flex-shrink: 0; }
+
+/* Smoothly blur and dim the scroll & Arcane Addendum card when archives are open */
+aside .arcane-oracle-card,
+aside .rules-box {
+  transition: filter 0.25s ease, opacity 0.25s ease;
+}
+aside.archives-open .arcane-oracle-card,
+aside.archives-open .rules-box {
+  filter: blur(7px) brightness(0.55);
+  opacity: 0.7;
+  pointer-events: none;
+}
 
 .sidebar-label {
   font-size: 11px; font-weight: 700; text-transform: uppercase;
@@ -109,8 +122,49 @@ aside {
 }
 
 .month-list { display: flex; flex-direction: column; gap: 6px; }
-.scrollable-months { overflow-y: auto; padding-right: 4px; flex: 1; margin-top: 6px; }
+
+/* Transparent floating archive overlay capped inside sidebar height with hairline scrollbar & bottom fade */
+.scrollable-months {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: calc(100vh - 205px);
+  overflow-y: auto;
+  padding: 6px 4px 18px 0;
+  margin-top: 6px;
+  background: transparent;
+  -webkit-mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 88%, transparent 100%);
+}
 .scrollable-months.collapsed { display: none; }
+
+/* Custom hairline rune scrollbar for long archive lists */
+.scrollable-months::-webkit-scrollbar { width: 4px; }
+.scrollable-months::-webkit-scrollbar-track { background: transparent; }
+.scrollable-months::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.35); border-radius: 999px; }
+
+/* Row container pairing each archived month button with its delete trigger */
+.archive-row { display: flex; align-items: center; gap: 4px; }
+.archive-row .month-btn { flex: 1; min-width: 0; }
+.archive-del-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.archive-del-btn:hover {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.35);
+}
 
 .archive-toggle-btn {
   width: 100%; display: flex; align-items: center; justify-content: space-between;
@@ -131,7 +185,7 @@ aside {
 
 .badge { font-size: 10px; padding: 2px 7px; border-radius: 999px; font-weight: 700; }
 .badge-active { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; }
-.badge-archived { background: rgba(165, 180, 252, 0.2); color: #e0e7ff; }
+.badge-archived { background: rgba(165, 180, 252, 0.2); color: #c0e7ff; }
 
 /* Floating Sleek Ancient Burnt Scroll (Centered Dead-Middle in Open Sidebar Sky) */
 .arcane-oracle-card {
