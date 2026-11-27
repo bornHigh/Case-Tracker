@@ -337,22 +337,83 @@ function renderSidebarAndCards(tab, m) {
     crt: { title: 'CRT NE Rate', value: m.crtPct !== null ? `${m.crtPct.toFixed(1)}%` : '—', sub: `Bonus: +€${m.crtBonus} (Target 94%+)`, color: m.crtPct !== null && m.crtPct >= 94 ? 'txt-green' : '' }
   };
 
+    // Short archaic labels for the 5 circular KPI Runic Medallions
+  const shortTitles = {
+    bonus: 'BONUS POOL',
+    csat: 'CSAT',
+    aht: 'AVG AHT',
+    quality: 'SQS MONIT',
+    crt: 'CRT NE'
+  };
+
+  // Elemental rune ring color palettes synced to each metric's live status
+  const auraPalettes = {
+    'txt-green': { outer: '#10b981', inner: '#fbbf24', glyph: '#fde047', coreTop: '#064e3b', glow: 'rgba(16, 185, 129, 0.55)' },
+    'txt-red':   { outer: '#ef4444', inner: '#fca5a5', glyph: '#fecaca', coreTop: '#7f1d1d', glow: 'rgba(239, 68, 68, 0.65)' },
+    'txt-amber': { outer: '#f59e0b', inner: '#fde68a', glyph: '#fef08a', coreTop: '#78350f', glow: 'rgba(245, 158, 11, 0.55)' },
+    default:     { outer: '#38bdf8', inner: '#a5f3fc', glyph: '#e0f2fe', coreTop: '#0c4a6e', glow: 'rgba(56, 189, 248, 0.48)' }
+  };
+
+  const SVG_NS = 'http://' + 'www.w3.org' + '/2000/svg';
   const kpiGrid = document.getElementById('kpiGrid');
   clearEl(kpiGrid);
+
   state.kpiOrder.forEach(key => {
     const c = cardsData[key];
-    const card = makeEl('div', 'kpi-card');
+    const pal = auraPalettes[c.color] || auraPalettes.default;
+    const uid = `kpiOrb_${key}_${Math.random().toString(36).slice(2, 6)}`;
+
+    const card = makeEl('div', 'kpi-card kpi-orb' + (c.color === 'txt-red' ? ' orb-alert' : ''));
     card.dataset.kpi = key;
     card.draggable = true;
-    const top = makeEl('div', 'kpi-top');
-    top.appendChild(makeEl('span', '', c.title));
-    top.appendChild(makeEl('span', 'grip', '⋮⋮'));
-    card.appendChild(top);
-    card.appendChild(makeEl('div', 'kpi-value ' + c.color, c.value));
-    card.appendChild(makeEl('div', 'kpi-sub', c.sub));
+    card.title = `${c.title} — Drag to reorder`;
+    card.style.setProperty('--orb-glow', pal.glow);
+
+    // Self-contained counter-rotating Runic Astrolabe SVG ring
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 180 180');
+    svg.setAttribute('class', 'kpi-orb-svg');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = `
+      <defs>
+        <path id="${uid}_path" d="M 90,90 m -74,0 a 74,74 0 1,1 148,0 a 74,74 0 1,1 -148,0" />
+        <radialGradient id="${uid}_bg" cx="50%" cy="32%" r="65%">
+          <stop offset="0%" stop-color="${pal.coreTop}" stop-opacity="0.72" />
+          <stop offset="100%" stop-color="#090d16" stop-opacity="0.96" />
+        </radialGradient>
+      </defs>
+      <!-- Outer Clockwise Elder Futhark Rune Orbit -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="0 90 90" to="360 90 90" dur="44s" repeatCount="indefinite" />
+        <circle cx="90" cy="90" r="86" fill="none" stroke="${pal.outer}" stroke-width="1.5" stroke-opacity="0.75" />
+        <circle cx="90" cy="90" r="68" fill="none" stroke="${pal.inner}" stroke-width="1" stroke-dasharray="3 5" stroke-opacity="0.55" />
+        <text fill="${pal.glyph}" fill-opacity="0.82" font-size="8.4" font-weight="700" letter-spacing="3.2">
+          <textPath href="#${uid}_path" startOffset="0%">ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ ᛇ ᛈ ᛉ ᛊ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ • </textPath>
+        </text>
+      </g>
+      <!-- Inner Counter-Clockwise Sacred Hexagram Filigree -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate" from="360 90 90" to="0 90 90" dur="32s" repeatCount="indefinite" />
+        <polygon points="90,24 147,123 33,123" fill="none" stroke="${pal.outer}" stroke-width="1" stroke-opacity="0.32" />
+        <polygon points="90,156 147,57 33,57" fill="none" stroke="${pal.outer}" stroke-width="1" stroke-opacity="0.32" />
+      </g>
+      <!-- Frosted Circular Sanctuary Core -->
+      <circle cx="90" cy="90" r="61" fill="url(#${uid}_bg)" stroke="${pal.inner}" stroke-width="1.4" stroke-opacity="0.75" />
+    `;
+    card.appendChild(svg);
+
+    // Centered KPI content inside the circular sanctuary
+    const core = makeEl('div', 'kpi-orb-core');
+    core.appendChild(makeEl('span', 'grip orb-grip', '⋮⋮'));
+    core.appendChild(makeEl('div', 'kpi-top', shortTitles[key] || c.title));
+    core.appendChild(makeEl('div', 'kpi-value ' + c.color, c.value));
+    core.appendChild(makeEl('div', 'kpi-sub', c.sub));
+    card.appendChild(core);
+
     kpiGrid.appendChild(card);
   });
 }
+
 function renderCaseTable(tab) {
   const totalPages = Math.max(1, Math.ceil(tab.cases.length / CASE_PAGE_SIZE));
   if (casePage >= totalPages) casePage = totalPages - 1;
