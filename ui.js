@@ -206,12 +206,34 @@ function renderSidebarAndCards(tab, m) {
   const activeTabs = state.tabs.filter(t => !t.archived);
   const archivedTabs = state.tabs.filter(t => t.archived);
 
-  activeTabs.forEach(t => activeSlot.appendChild(makeMonthButton(t, tab.id)));
-  archivedTabs.forEach(t => archivedList.appendChild(makeMonthButton(t, tab.id)));
+    activeTabs.forEach(t => activeSlot.appendChild(makeMonthButton(t, tab.id)));
+  archivedTabs.forEach(t => {
+    const row = makeEl('div', 'archive-row');
+    const btn = makeMonthButton(t, tab.id);
+    const delBtn = makeEl('button', 'archive-del-btn', '✕');
+    delBtn.type = 'button';
+    delBtn.title = `Delete ${t.name}`;
+    delBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (!confirm(`Banish archived chronicle "${t.name}" forever?`)) return;
+      state.tabs = state.tabs.filter(x => x.id !== t.id);
+      if (state.activeTabId === t.id) {
+        const fallback = state.tabs.find(x => !x.archived) || state.tabs[0];
+        if (fallback) state.activeTabId = fallback.id;
+      }
+      saveState();
+      render();
+    };
+    row.appendChild(btn);
+    row.appendChild(delBtn);
+    archivedList.appendChild(row);
+  });
 
+  const isDrawerOpen = state.archivesExpanded && archivedTabs.length > 0;
   document.getElementById('archiveCount').textContent = archivedTabs.length;
   document.getElementById('archiveArrow').textContent = state.archivesExpanded ? '▾' : '▸';
-  archivedList.classList.toggle('collapsed', !state.archivesExpanded);
+  archivedList.classList.toggle('collapsed', !isDrawerOpen);
+  document.querySelector('aside').classList.toggle('archives-open', isDrawerOpen);
 
   document.getElementById('periodTitle').textContent = tab.name;
   const startInput = document.getElementById('startDateInput');
