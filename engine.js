@@ -1,7 +1,10 @@
 const STORAGE_KEY = 'caseflow_arcane_v4';
 const WALLPAPER_KEY = 'caseflow_arcane_wp_v4';
 const CASE_PAGE_SIZE = 10;
-const QA_PAGE_SIZE = 5;
+
+// Display 4 QA monits per page so the bottom panel never clips inside the zero-scroll 100vh desktop lock
+const QA_PAGE_SIZE = 4;
+
 
 const LEAF_GRADIENTS = [
   'linear-gradient(135deg, #10b981, #059669)',
