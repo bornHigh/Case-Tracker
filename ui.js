@@ -462,12 +462,22 @@ function renderSidebarAndCards(tab, m) {
     `;
     card.appendChild(svg);
 
+       // Compact single-line Runic Status Sigils etched cleanly inside each orb without overflowing the ring
+    const orbSigils = {
+      bonus: m.forfeited ? '✦ FORFEITED ✦' : `✦ RR ${m.rrPct !== null ? m.rrPct.toFixed(0) + '%' : 'VOID'} ✦`,
+      csat: `✦ +€${m.csatBonus} ✦`,
+      aht: m.avgAht !== null && m.avgAht > 32 ? '✦ -€50 PENALTY ✦' : '✦ ≤ 32.0M ✦',
+      quality: `✦ +€${m.qualBonus} • ${tab.qaAudits.length}M ✦`,
+      crt: `✦ +€${m.crtBonus} ✦`
+    };
+    card.title = `${c.title}: ${c.value} (${c.sub}) — Drag to reorder`;
+
     // Centered KPI content inside the circular sanctuary
     const core = makeEl('div', 'kpi-orb-core');
     core.appendChild(makeEl('span', 'grip orb-grip', '⋮⋮'));
     core.appendChild(makeEl('div', 'kpi-top', shortTitles[key] || c.title));
     core.appendChild(makeEl('div', 'kpi-value ' + c.color, c.value));
-    core.appendChild(makeEl('div', 'kpi-sub', c.sub));
+    core.appendChild(makeEl('div', 'kpi-sub orb-sigil', orbSigils[key] || ''));
     card.appendChild(core);
 
     kpiGrid.appendChild(card);
