@@ -348,11 +348,11 @@ main {
   flex-shrink: 0;
 }
 
-/* Color-reactive Ley-Line Conduit & Diamond Rune Relay filling the gaps between KPI orbs */
+/* Organic Astral Mist & Floating Fairy Wisps bridging the gaps between KPI orbs */
 .kpi-conduit {
-  flex: 1 1 28px;
-  min-width: 18px;
-  height: 36px;
+  flex: 1 1 32px;
+  min-width: 24px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -362,21 +362,16 @@ main {
 
 .conduit-svg {
   width: 100%;
-  height: 36px;
+  max-width: 110px;
+  height: 72px;
   overflow: visible;
 }
 
-.kpi-conduit.conduit-bounty { filter: drop-shadow(0 0 7px rgba(16, 185, 129, 0.65)); }
-.kpi-conduit.conduit-cyan   { filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.55)); }
-.kpi-conduit.conduit-doom   { animation: conduitCrackle 1.1s ease-in-out infinite; }
+.kpi-conduit.conduit-bounty { filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.55)); }
+.kpi-conduit.conduit-cyan   { filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.5)); }
+.kpi-conduit.conduit-doom   { filter: drop-shadow(0 0 9px rgba(244, 63, 94, 0.65)); }
 
-@keyframes conduitCrackle {
-  0%, 100% { filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.55)); opacity: 0.85; }
-  45%      { filter: drop-shadow(0 0 13px rgba(248, 113, 113, 0.95)); opacity: 1; }
-  70%      { filter: drop-shadow(0 0 7px rgba(251, 191, 36, 0.8)); opacity: 0.9; }
-}
-
-/* Stack orbs cleanly on narrow tablets/phones where 5 orbs wrap onto multiple lines */
+/* Hide floating gap wisps on narrow screens when orbs stack onto multiple rows */
 @media (max-width: 900px) {
   .kpi-grid { flex-wrap: wrap; justify-content: center; gap: 12px; }
   .kpi-conduit { display: none; }
