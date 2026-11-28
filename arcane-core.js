@@ -49,21 +49,16 @@ function normalizeOutcome(val) {
 // Normalize a single case entry so Case ID, Client, AHT, and outcomes always match columns
 function normalizeCaseEntry(raw) {
   const src = raw && typeof raw === 'object' ? raw : {};
-  const idVal = typeof src.id === 'string' && src.id.trim()
-    ? src.id.trim()
-    : typeof src.caseId === 'string' && src.caseId.trim()
-      ? src.caseId.trim()
-      : '—';
-  const clientVal = typeof src.client === 'string' && src.client.trim()
-    ? src.client.trim()
-    : typeof src.clientName === 'string' && src.clientName.trim()
-      ? src.clientName.trim()
-      : '—';
+  const idCandidates = [src.id, src.caseId, src.case_id, src.ticket];
+  const clientCandidates = [src.client, src.clientName, src.client_name];
+
+  const foundId = idCandidates.find(v => typeof v === 'string' && v.trim());
+  const foundClient = clientCandidates.find(v => typeof v === 'string' && v.trim());
   const parsedAht = parseFloat(src.aht);
 
   return {
-    id: idVal,
-    client: clientVal,
+    id: foundId ? foundId.trim() : '—',
+    client: foundClient ? foundClient.trim() : '—',
     aht: Number.isFinite(parsedAht) ? parsedAht : 0,
     csat: normalizeOutcome(src.csat),
     crt: normalizeOutcome(src.crt),
@@ -941,7 +936,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('wallpaperModal').classList.add('hidden');
   });
 
-  document.getElementById('toggleArchivesBtn').addEventListener('click', () => {
+  document.getElementById('toggleArchivesBtn').addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
     const hasArchives = state.tabs.some(t => t.archived);
     state.archivesExpanded = hasArchives ? !state.archivesExpanded : false;
     saveState();
