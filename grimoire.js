@@ -977,9 +977,6 @@ function reorderListByTarget(list, itemId, targetId) {
   return true;
 }
 
-let draggedKpiKey = null;
-let draggedPanelId = null;
-
 function clearDragClasses() {
   document.querySelectorAll('.kpi-card.drag-over, .kpi-card.dragging').forEach(el => {
     el.classList.remove('drag-over', 'dragging');
